@@ -38,8 +38,10 @@ yarn-error.*
 # iOS Build Dosyaları
 ios/build/
 ios/Pods/
+ios/
 
 # Android Build Dosyaları
+android/
 android/app/build/
 android/.gradle/
 android/.idea/
