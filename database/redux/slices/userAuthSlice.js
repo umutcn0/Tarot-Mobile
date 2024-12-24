@@ -7,7 +7,7 @@ import {
 } from "firebase/auth";
 import { auth } from "../../firebase/firebaseConfig";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-  import { userModel } from "../models/UserModel";
+import { userModel } from "../models/UserModel";
 
 
 export const signInAsync = createAsyncThunk(
@@ -21,12 +21,10 @@ export const signInAsync = createAsyncThunk(
       );
       const user = userCredential.user;
       const token = user.stsTokenManager.accessToken;
-      const idToken = await user.getIdToken();
 
       const userData = {
         ...userModel,
         authToken: token,
-        idToken: idToken,
         email: user.email,
         uid: user.uid,
         displayName: user.displayName || null,
@@ -58,18 +56,13 @@ export const signUpAsync = createAsyncThunk(
       });
 
       const token = user.stsTokenManager.accessToken;
-      // Get idToken using getIdToken() method
-      const idToken = await user.getIdToken();
 
       const userData = {
         ...userModel,
         id: user.uid,
         email: user.email,
         emailVerified: user.emailVerified,
-        password: user.password,
         displayName: user.displayName || null,
-        authToken: token,
-        idToken: idToken,
         createdAt: user.metadata.creationTime,
         updatedAt: user.metadata.creationTime,
         lastLogin: user.metadata.lastSignInTime,
@@ -116,7 +109,6 @@ const initialState = {
   user: userModel,
   uid: null,
   token: null,
-  idToken: null,
   isAuth: false,
   isLoading: false,
   isLoggedIn: false,
@@ -141,7 +133,6 @@ export const userAuthSlice = createSlice({
         state.user = action.payload;
         state.uid = action.payload.uid;
         state.token = action.payload.authToken;
-        state.idToken = action.payload.idToken;
         state.isAuth = true;
         state.isLoggedIn = true;
         state.isLoading = false;
@@ -157,7 +148,6 @@ export const userAuthSlice = createSlice({
       .addCase(signOutAsync.fulfilled, (state) => {
         state.user = null;
         state.token = null;
-        state.idToken = action.payload.idToken;
         state.isAuth = false;
         state.isLoggedIn = false;
         state.isLoading = false;
@@ -173,7 +163,6 @@ export const userAuthSlice = createSlice({
       .addCase(signUpAsync.fulfilled, (state, action) => {
         state.user = action.payload;
         state.token = action.payload.authToken;
-        state.idToken = action.payload.idToken;
         state.uid = action.payload.uid;
         state.isAuth = true;
         state.isLoggedIn = true;
@@ -186,7 +175,6 @@ export const userAuthSlice = createSlice({
       .addCase(getUserToken.fulfilled, (state, action) => {
         state.user = action.payload;
         state.token = action.payload.authToken;
-        state.idToken = action.payload.idToken;
         state.uid = action.payload.uid;
         state.email = action.payload.email;
         state.isAuth = true;

@@ -1,32 +1,39 @@
-import { StyleSheet, View, ActivityIndicator } from "react-native";
+import { StyleSheet, View, ActivityIndicator, Dimensions } from "react-native";
 import React from "react";
 import { LinearGradient } from "expo-linear-gradient";
 
+const { width, height } = Dimensions.get('window');
+
 const LoadingOverlay = () => {
   return (
-    <LinearGradient
-    colors={['#1e1b4b', '#4a044e', '#3b0764']}
-    style={styles.container}
-    start={{ x: 0, y: 0 }}
-    end={{ x: 1, y: 1 }}
-    >
+    <View style={styles.overlay}>
+      <LinearGradient
+        colors={['rgba(0,0,0,0.7)', 'rgba(0,0,0,0.8)']}
+        style={styles.container}
+      >
         <ActivityIndicator size="large" color="#fff" />
-    </LinearGradient>
+      </LinearGradient>
+    </View>
   );
 };
 
 export default LoadingOverlay;
 
 const styles = StyleSheet.create({
-  container: {
-    position: "absolute",
+  overlay: {
+    position: 'absolute',
+    top: 0,
     left: 0,
     right: 0,
-    top: 0,
     bottom: 0,
-    backgroundColor: "#1e1b4b",
+    width: width,
+    height: height,
+    zIndex: 999,
+  },
+  container: {
+    flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    zIndex: 999,
+    backgroundColor: 'rgba(0,0,0,0.5)',
   },
 });

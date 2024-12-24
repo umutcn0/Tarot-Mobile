@@ -34,8 +34,15 @@ export const userUpdateAsync = createAsyncThunk(
 export const userAddAsync = createAsyncThunk(
     "user/userAdd",
     async (user, { rejectWithValue }) => {
-        const docRef = await addDoc(userCollection, user);
-        return { id: docRef.id, ...user };
+        try {
+            const docRef = doc(userCollection, user.id);
+            await setDoc(docRef, user);
+            console.log("User successfully added with ID:", user.id);
+            return { id: user.id, ...user };
+        } catch (error) {
+            console.error("Error adding user:", error);
+            return rejectWithValue(error.message);
+        }
     }
 );
 

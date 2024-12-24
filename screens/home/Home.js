@@ -1,12 +1,8 @@
-import { StyleSheet, Text, View, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import { StyleSheet, Text, View, ScrollView, SafeAreaView } from 'react-native'
+import React from 'react'
 import { LinearGradient } from 'expo-linear-gradient';
-import { Ionicons } from '@expo/vector-icons';
 import FortuneCard from '../../components/FortuneCard';
 import BottomNavigation from '../../components/BottomNavigation';
-import { useSelector, useDispatch } from 'react-redux';
-import {getFortuneAsync} from '../../database/redux/slices/fortuneTypesSlice';
-import Loading from '../common/Loading';
 import TopProfileBar from '../common/TopProfileBar';
 
 

@@ -10,12 +10,15 @@ import BottomNavigation from '../../components/BottomNavigation';
 const Profile = ({navigation}) => {
   const user = useSelector((state) => state.userAuth.user);
   const isLoading = useSelector((state) => state.userAuth.isLoading);
-  console.log(user)
-
   const dispatch = useDispatch();
 
   const handleLogout = () => {
-    dispatch(signOutAsync());
+    try {
+      dispatch(signOutAsync());
+    }
+    catch (error) {
+      console.error(error);
+    }
   }
 
   return (
@@ -25,9 +28,9 @@ const Profile = ({navigation}) => {
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
     >
+      {isLoading && <Loading/>}
       <SafeAreaView style={styles.container}>
         <ScrollView style={styles.scrollView}>
-          {isLoading && <Loading/>}
           {/* Profile Header */}
           <View style={styles.header}>
             <TouchableOpacity style={styles.avatarContainer}>

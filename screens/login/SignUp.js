@@ -27,8 +27,14 @@ const SignUp = ({navigation}) => {
   const handleSignUp = async () => {
     try {
       const signUpResponse = await dispatch(signUpAsync({ name, email, password })).unwrap();
-      signUpResponse.password = CryptoJS.SHA256(password).toString();
-      await dispatch(userAddAsync(signUpResponse));
+      const hashedPassword = CryptoJS.SHA256(password).toString();
+
+      const userData = {
+        ...signUpResponse,
+        password: hashedPassword
+      }
+
+      await dispatch(userAddAsync(userData));
     } catch (error) {
       console.log(error);
     }
@@ -54,7 +60,7 @@ const SignUp = ({navigation}) => {
                         <Text style={styles.subtitle}>Create your account</Text>
 
                         {/* Name input */}
-                        <LoginTextInput inputText="Your Name" onChangeText={setName} keyboardType="default" value={name} placeholder="John Doe" inputIcon="person" />
+                        <LoginTextInput inputText="Your Name" onChangeText={setName} keyboardType="default" value={name} placeholder="John Doe" inputIcon="mail" />
                         {/* Email input */}
                         <LoginTextInput inputText="Ethereal Email" onChangeText={setEmail} keyboardType="email-address" value={email} placeholder="your.spirit@realm.com" inputIcon="mail" />
                         {/* Password input */}

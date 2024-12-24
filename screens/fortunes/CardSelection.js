@@ -6,6 +6,8 @@ import BottomNavigation from '../../components/BottomNavigation';
 import { cardImages, defaultCardsImages } from '../../media/imageList';
 import Loading from '../common/Loading';
 import TopProfileBar from '../common/TopProfileBar';
+import { useDispatch } from 'react-redux';
+import { sendFortune } from '../../database/redux/slices/fortuneChatSlice';
 
 const CardSelection = ({ navigation, selectCardAmount=3 }) => {
   const [cards, setCards] = useState([]);
@@ -13,6 +15,9 @@ const CardSelection = ({ navigation, selectCardAmount=3 }) => {
   const [selectedCards, setSelectedCards] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [numColumns, setNumColumns] = useState(3);
+  const [isSending, setIsSending] = useState(false);
+
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const shuffleArray = (array) => {
@@ -51,6 +56,31 @@ const CardSelection = ({ navigation, selectCardAmount=3 }) => {
     </TouchableOpacity>
   );
 
+  const sendFortuneToService = async () => {
+    try {
+      if (selectedCards.length < 3) {
+        alert("Lütfen 3 kart seçiniz.");
+        return;
+      }
+  
+      setIsSending(true);
+      
+      const result = await dispatch(sendFortune({
+        selectedCards: selectedCards
+      })).unwrap();
+  
+      if (result) {
+        navigation.navigate('Home');
+      }
+  
+    } catch (error) {
+      console.error('Fortune sending error:', error);
+      alert('Fal gönderilirken bir hata oluştu');
+    } finally {
+      setIsSending(false);
+    }
+  };
+
   return (
     <LinearGradient
       colors={['#1e1b4b', '#4a044e', '#3b0764']}
@@ -75,8 +105,14 @@ const CardSelection = ({ navigation, selectCardAmount=3 }) => {
         />
 
         {/* Submit Button */}
-        <TouchableOpacity style={styles.submitButton}>
-            <Text style={styles.submitText}>Submit Selected Cards</Text>
+        <TouchableOpacity 
+          style={styles.submitButton} 
+          onPress={sendFortuneToService}
+          disabled={isSending}
+        >
+          <Text style={styles.submitText}>
+            {isSending ? 'Gönderiliyor...' : 'Kartları Gönder'}
+          </Text>
         </TouchableOpacity>
       </SafeAreaView>
       <BottomNavigation navigation={navigation} pageName="CardSelection"/>
