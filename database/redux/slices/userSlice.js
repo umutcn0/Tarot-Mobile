@@ -18,7 +18,8 @@ export const getUserAsync = createAsyncThunk(
   async (uid, { rejectWithValue }) => {
     const q = query(userCollection, where("uid", "==", uid));
     const querySnapshot = await getDocs(q);
-    return querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    const user = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))[0];
+    return user;
   }
 );
 

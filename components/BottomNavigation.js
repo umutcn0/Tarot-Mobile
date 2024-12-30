@@ -3,11 +3,20 @@ import React from "react";
 import { Ionicons } from '@expo/vector-icons';
 
 const BottomNavigation = ({ navigation, pageName }) => {
+  const handleNavigation = (screenName) => {
+    if (pageName !== screenName) {
+      navigation.reset({
+        index: 0,
+        routes: [{ name: screenName }],
+      });
+    }
+  };
+
   return (
     <View style={styles.bottomNav}>
       <TouchableOpacity
         style={styles.navItem}
-        onPress={() => navigation.navigate("Home")}
+        onPress={() => handleNavigation("Home")}
       >
         <Ionicons
           name="home"
@@ -26,7 +35,7 @@ const BottomNavigation = ({ navigation, pageName }) => {
 
       <TouchableOpacity
         style={styles.navItem}
-        onPress={() => navigation.navigate("History")}
+        onPress={() => handleNavigation("History")}
       >
         <Ionicons
           name="eye-outline"
@@ -45,7 +54,7 @@ const BottomNavigation = ({ navigation, pageName }) => {
 
       <TouchableOpacity
         style={styles.navItem}
-        onPress={() => navigation.navigate("Token")}
+        onPress={() => handleNavigation("Token")}
       >
         <Ionicons
           name="diamond-outline"
@@ -64,7 +73,7 @@ const BottomNavigation = ({ navigation, pageName }) => {
 
       <TouchableOpacity
         style={styles.navItem}
-        onPress={() => navigation.navigate("Profile")}
+        onPress={() => handleNavigation("Profile")}
       >
         <Ionicons
           name="person"

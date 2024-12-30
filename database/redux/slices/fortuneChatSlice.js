@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import {getAuth} from 'firebase/auth'
 import Config from 'react-native-config';
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useSelector } from 'react-redux';
 
 const SERVER_URL = __DEV__ ? Config.API_SERVER_DEV_URL : Config.API_SERVER_URL;
 const auth = getAuth()
@@ -11,9 +11,8 @@ export const sendFortune = createAsyncThunk(
   async (items, { rejectWithValue }) => {
     try {
       const token = await auth.currentUser.getIdToken(/* forceRefresh */ true);
-      const user = await AsyncStorage.getItem("user");
-      const user_id = JSON.parse(user).uid;
-      console.log(token)
+      const user = useSelector((state) => state.userAuth.user);
+      const user_id = user.uid;
 
       const request_body = {
         "selected_cards": items.selectedCards,
@@ -23,8 +22,6 @@ export const sendFortune = createAsyncThunk(
       if (items.message) {
         request_body.message = items.message;
       }
-
-      console.log(request_body)
 
       const response = await fetch(
         `${SERVER_URL}/api/chat-test`,

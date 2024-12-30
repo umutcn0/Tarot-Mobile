@@ -16,7 +16,8 @@ import {
   TestIds,
 } from "react-native-google-mobile-ads";
 import Loading from "../common/Loading";
-
+import { useSelector } from 'react-redux';
+import { updateUserToken } from "../../services/tokenServices";
 
 
 const DisableAds = ({ tokenAmount, price }) => {
@@ -29,46 +30,44 @@ const DisableAds = ({ tokenAmount, price }) => {
 };
 
 const Token = ({ navigation }) => {
-  const [loaded, setLoaded] = useState(false);
-  const [rewarded, setRewarded] = useState(null);
+  const [loaded, setLoaded] = useState(true);
+  const [rewardedAd, setRewardedAd] = useState(null);
+  const [adShown, setAdShown] = useState(false);
+  const user = useSelector((state) => state.userAuth.user);
 
-  useEffect(() => {
-
+  const loadAd = () => {
+    setLoaded(false);
     const adUnitId = __DEV__
-    ? TestIds.REWARDED
-    : "ca-app-pub-4666300760854612/5031399665";
+      ? TestIds.REWARDED
+      : "ca-app-pub-4666300760854612/5031399665";
 
-    
+    const rewardedAd = RewardedAd.createForAdRequest(adUnitId);
+    setRewardedAd(rewardedAd);
 
-    console.log(adUnitId);
-
-    const rewarded = RewardedAd.createForAdRequest(adUnitId);
-    setRewarded(rewarded)
-
-    const unsubscribeLoaded = rewarded.addAdEventListener(
+    const unsubscribeLoaded = rewardedAd.addAdEventListener(
       RewardedAdEventType.LOADED,
       () => {
+        setLoaded(true);
+        rewardedAd.show(); // Show ad once loaded
       }
     );
 
-    const unsubscribeEarned = rewarded.addAdEventListener(
+    const unsubscribeEarned = rewardedAd.addAdEventListener(
       RewardedAdEventType.EARNED_REWARD,
       (reward) => {
-        console.log("User earned reward of ", reward);
+        console.log("User earned reward of ", reward.amount);
+        updateUserToken(user.uid, reward.amount);
         navigation.navigate("Home");
-        // Here you can update the token amount or state as needed
       }
     );
 
-    // Start loading the rewarded ad straight away
-    rewarded.load();
+    rewardedAd.load();
 
-    // Unsubscribe from events on unmount
     return () => {
       unsubscribeLoaded();
       unsubscribeEarned();
     };
-  }, [navigation]);
+  };
 
   return (
     <LinearGradient
@@ -100,7 +99,8 @@ const Token = ({ navigation }) => {
             <TouchableOpacity
               style={styles.earnButton}
               onPress={() => {
-                rewarded.show();
+                loadAd(); // Load and show ad when button is clicked
+                setAdShown(true);
               }}
             >
               <Text style={styles.earnButtonText}>Token Kazan</Text>

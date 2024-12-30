@@ -3,19 +3,19 @@ import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native'
 import React from 'react'
 import { Ionicons } from '@expo/vector-icons';
 
-const FortuneCard = ( { navigation, navigationPage, title, description, icon, coinAmount=3 } ) => {
+const FortuneCard = ( { navigation, navigationPage, category_title, category_description, icon, coinAmount=3 } ) => {
   return (
     <TouchableOpacity style={styles.fortuneCard} 
-      onPress={() => navigation.navigate(navigationPage)}>
+      onPress={() => navigation.navigate(navigationPage, { selectCardAmount: coinAmount, category_title: category_title, category_description: category_description })}>
         <Ionicons name={icon} size={32} color="#fff" />
-        <Text style={styles.fortuneTitle}>{title}</Text>
+        <Text style={styles.fortuneTitle}>{category_title}</Text>
         <View style={styles.coinBox}>
           <Image source={ require('../media/common/coin.png') }
             style={styles.coinImage}
           ></Image>
           <Text style={styles.coinText}>{coinAmount}</Text>
         </View>
-        <Text style={styles.fortuneDescription}>{description}</Text>
+        <Text style={styles.fortuneDescription}>{category_description}</Text>
   </TouchableOpacity>
   )
 }

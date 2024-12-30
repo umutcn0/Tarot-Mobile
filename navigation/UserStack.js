@@ -1,7 +1,7 @@
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { Home, History, Profile, Settings, Token } from "../screens/home";
-import { CardSelection, FaithFortune } from "../screens/fortunes";
+import { CardSelection, FaithFortune, FortuneDetail } from "../screens/fortunes";
 import { AppSettings, ProfileSettings, Support } from "../screens/profile";
 import { RewardedAds } from "../screens/ads";
 
@@ -63,6 +63,11 @@ const UserStack = () => {
       <Stack.Screen
         name="RewardedAds"
         component={RewardedAds}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="FortuneDetail"
+        component={FortuneDetail}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

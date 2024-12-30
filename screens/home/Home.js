@@ -26,57 +26,57 @@ const Home = ({ navigation }) => {
           <FortuneCard
             navigation={navigation}
             navigationPage="CardSelection"
-            title="Genel Hayat"
-            description="Yaşamındaki genel yönleri değerlendirir."
+            category_title="Genel Hayat"
+            category_description="Yaşamındaki genel yönleri değerlendirir."
             icon="cube-outline"
           />
           <FortuneCard
             navigation={navigation}
             navigationPage="CardSelection"
-            title="Aşk ve İlişkiler"
-            description="İlişkilerdeki dinamikler hakkında rehberlik sağlamak."
+            category_title="Aşk ve İlişkiler"
+            category_description="İlişkilerdeki dinamikler hakkında rehberlik sağlamak."
             icon="heart-outline"
           />
           <FortuneCard
             navigation={navigation}
             navigationPage="CardSelection"
-            title="Kariyer ve İş"
-            description="İş hayatı ve kariyer yolculuğu"
+            category_title="Kariyer ve İş"
+            category_description="İş hayatı ve kariyer yolculuğu"
             icon="briefcase-outline"
           />
           <FortuneCard
             navigation={navigation}
             navigationPage="CardSelection"
-            title="Maddi Durum ve Finansal"
-            description="Finansal durumunuz hakkında bilgi verir."
+            category_title="Maddi Durum ve Finansal"
+            category_description="Finansal durumunuz hakkında bilgi verir."
             icon="cash-outline"
           />
           <FortuneCard
             navigation={navigation}
             navigationPage="CardSelection"
-            title="Sağlık ve Zindelik"
-            description="Sağlık ve zindelik durumunuz hakkında bilgi verir."
+            category_title="Sağlık ve Zindelik"
+            category_description="Sağlık ve zindelik durumunuz hakkında bilgi verir."
             icon="moon-outline"
           />
           <FortuneCard
             navigation={navigation}
             navigationPage="CardSelection"
-            title="Kişisel Gelişim ve Ruhsal"
-            description="Kişisel gelişim ve ruhsal durumunuz hakkında bilgi verir."
+            category_title="Kişisel Gelişim ve Ruhsal"
+            category_description="Kişisel gelişim ve ruhsal durumunuz hakkında bilgi verir."
             icon="barbell-outline"
           />
           <FortuneCard
             navigation={navigation}
             navigationPage="CardSelection"
-            title="Zaman Çerçevesi"
-            description="Zaman çerçevenizi belirler."
+            category_title="Zaman Çerçevesi"
+            category_description="Zaman çerçevenizi belirler."
             icon="time-outline"
           />
           <FortuneCard
             navigation={navigation}
             navigationPage="FaithFortune"
-            title="Niyet Falı"
-            description="Niyetlerinizin gerçekleşme olasılığını gösterir."
+            category_title="Niyet Falı"
+            category_description="Niyetlerinizin gerçekleşme olasılığını gösterir."
             icon="gift-outline"
             coinAmount={5}
           />

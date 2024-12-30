@@ -1,4 +1,5 @@
 import CardSelection from "./CardSelection"
 import FaithFortune from "./FaithFortune"
+import FortuneDetail from "./FortuneDetail"
 
-export {CardSelection, FaithFortune}
+export {CardSelection, FaithFortune, FortuneDetail}

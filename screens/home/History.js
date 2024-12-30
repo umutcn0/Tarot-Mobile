@@ -1,11 +1,68 @@
 import { StyleSheet, Text, View, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native'
 import React from 'react'
 import { LinearGradient } from 'expo-linear-gradient'
-import { Ionicons } from '@expo/vector-icons'
 import BottomNavigation from '../../components/BottomNavigation';
 import TopProfileBar from '../common/TopProfileBar';
+import { getFortuneHistory } from '../../services/fortuneServices';
+import { useSelector } from 'react-redux';
+
+const FortuneHistoryItem = ({ historyItem, onPress, isCompleted }) => {
+  const WrappedView = isCompleted ? TouchableOpacity : View;
+  
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'completed':
+        return '#10B981'; // green
+      case 'pending':
+        return '#F59E0B'; // amber
+      default:
+        return '#6B7280'; // gray
+    }
+  };
+
+  return (
+    <WrappedView 
+      style={[
+        styles.historyEntry,
+        !isCompleted && styles.disabledEntry
+      ]}
+      onPress={isCompleted ? onPress : null}
+    >
+      <View style={styles.entryHeader}>
+        <View style={styles.categoryContainer}>
+          <Text style={styles.entryTitle}>{historyItem.category_title}</Text>
+          <View style={[
+            styles.statusBadge, 
+            { backgroundColor: getStatusColor(historyItem.status) }
+          ]}>
+            <Text style={styles.statusText}>{historyItem.status}</Text>
+          </View>
+        </View>
+        <View style={styles.dateContainer}>
+          <Text style={styles.dateText}>{historyItem.created_at}</Text>
+        </View>
+      </View>
+    </WrappedView>
+  );
+};
 
 const History = ({ navigation }) => {
+  const [historyItems, setHistoryItems] = React.useState([]);
+  const user = useSelector((state) => state.userAuth.user);
+
+  React.useEffect(() => {
+    const fetchHistory = async () => {
+      try {
+        const history = await getFortuneHistory(user.uid);
+        setHistoryItems(history);
+      } catch (error) {
+        console.error('Error fetching fortune history:', error);
+      }
+    };
+
+    fetchHistory();
+  }, []);
+
   return (
     <LinearGradient
       colors={['#1e1b4b', '#4a044e', '#3b0764']}
@@ -15,27 +72,21 @@ const History = ({ navigation }) => {
     >
       <SafeAreaView style={styles.container}>
         <TopProfileBar navigation={navigation} />
-
-        {/* Fortune History Section */}
         <ScrollView style={styles.scrollView}>
-          {/* Example Fortune Entries */}
-          <View style={styles.historyEntry}>
-            <Text style={styles.entryTitle}>General Life</Text>
-            <Text style={styles.entryDescription}>Your life is on a positive trajectory.</Text>
-            <Text style={styles.entryDescription}>Status: 30 min remain</Text>
-          </View>
-          <View style={styles.historyEntry}>
-            <Text style={styles.entryTitle}>Love and Relationships</Text>
-            <Text style={styles.entryDescription}>A new connection is on the horizon.</Text>
-            <Text style={styles.entryDescription}>Status: 30 min remain</Text>
-          </View>
-          {/* Add more entries as needed */}
+          {historyItems.map((item, index) => (
+            <FortuneHistoryItem
+              key={index}
+              historyItem={item}
+              isCompleted={item.status === 'completed'}
+              onPress={() => navigation.navigate('FortuneDetail', { fortuneId: item.id })}
+            />
+          ))}
         </ScrollView>
       </SafeAreaView>
       <BottomNavigation navigation={navigation} pageName="FortuneHistory"/>
     </LinearGradient>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -57,20 +108,59 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   historyEntry: {
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    borderRadius: 12,
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    borderRadius: 16,
     padding: 16,
-    marginBottom: 0,
-    margin:20,
+    marginHorizontal: 20,
+    marginVertical: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  entryHeader: {
+    gap: 8,
+  },
+  categoryContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 4,
   },
   entryTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: '600',
     color: '#fff',
+    flex: 1,
   },
-  entryDescription: {
-    fontSize: 14,
-    color: 'rgba(244, 114, 182, 0.7)',
+  statusBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+    marginLeft: 8,
+  },
+  statusText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '500',
+    textTransform: 'capitalize',
+  },
+  dateContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  dateText: {
+    fontSize: 13,
+    color: 'rgba(255, 255, 255, 0.6)',
+  },
+  disabledEntry: {
+    opacity: 0.5,
   },
 })
 
