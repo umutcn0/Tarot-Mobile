@@ -6,26 +6,29 @@ import BottomNavigation from '../../components/BottomNavigation'
 import { getFortune } from '../../services/fortuneServices'
 import Loading from '../common/Loading'
 import { useSelector } from 'react-redux'
+import { cardImages } from '../../media/imageList'
 
 
 const CardReview = ({ card }) => {
-  console.log("card", card);
+  const cardName = card.image_name.toLowerCase()
+  const cardImage = cardImages.find(image => image.name === cardName).image;
+  
   return (
     <View style={styles.cardContainer}>
       <Image
-        source={require('../../media/cards/The_Fool.jpg')} // This should be dynamic based on card name
-      style={styles.cardImage}
-      resizeMode="contain"
-    />
-    <Text style={styles.cardName}>{card.card_name}</Text>
-    <View style={styles.meaningContainer}>
-      <Text style={styles.sectionTitle}>Anlamı</Text>
-      <Text style={styles.meaningText}>{card.card_meaning}</Text>
-    </View>
-    <View style={styles.messageContainer}>
-      <Text style={styles.sectionTitle}>Genel Mesaj</Text>
-      <Text style={styles.messageText}>{card.card_message}</Text>
-    </View>
+        source={cardImage}
+        style={styles.cardImage}
+        resizeMode="contain"
+      />
+      <Text style={styles.cardName}>{card.name}</Text>
+      <View style={styles.meaningContainer}>
+        <Text style={styles.sectionTitle}>Anlamı</Text>
+        <Text style={styles.meaningText}>{card.meaning}</Text>
+      </View>
+      <View style={styles.messageContainer}>
+        <Text style={styles.sectionTitle}>Genel Mesaj</Text>
+        <Text style={styles.messageText}>{card.message}</Text>
+      </View>
     </View>
   );
 };
@@ -39,8 +42,8 @@ const FortuneDetail = ({ navigation, route }) => {
 
   useEffect(() => {
     const fetchFortune = async () => {
-      console.log("fetching fortune");
-      const fortune = await getFortune(user.uid, fortuneId);
+      var fortune = await getFortune(user.uid, fortuneId);
+      fortune = fortune[0].result
       setFortune(fortune);
       setLoading(false);
     };
@@ -65,7 +68,7 @@ const FortuneDetail = ({ navigation, route }) => {
           <View style={styles.generalCommentContainer}>
             <Text style={styles.sectionTitle}>Genel Yorum</Text>
             <Text style={styles.generalCommentText}>
-              {fortune["general_message"]}
+              {fortune.general_message}
             </Text>
           </View>
         </ScrollView>

@@ -5,22 +5,108 @@ import {
   TouchableOpacity,
   ScrollView,
   SafeAreaView,
+  Modal,
+  TextInput,
 } from "react-native";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import { signOutAsync } from "../../database/redux/slices/userAuthSlice";
 import { useDispatch, useSelector } from "react-redux";
 import Loading from "../common/Loading";
 import BottomNavigation from "../../components/BottomNavigation";
+import { getUserAsync, userUpdateAsync } from "../../database/redux/slices/userSlice";
+import * as Clipboard from 'expo-clipboard';
+import { Alert } from 'react-native';
+import ProfileEditModal from '../../components/ProfileEditModal';
+
+
+const SettingsTouchableOpacity = ({user, openModal, field_name, field_title}) => {
+  if (!user) return null;
+  
+  return (
+    <TouchableOpacity style={styles.option}
+      onPress={() => openModal(field_name, user[field_name])}
+    >
+      <Text style={styles.optionText}>{field_title}: {user[field_name] || "Not set"}</Text>
+      <Ionicons name="chevron-forward" size={24} color="rgba(255, 255, 255, 0.5)" />
+    </TouchableOpacity>
+  )
+}
 
 const ProfileSettings = ({ navigation }) => {
   const user = useSelector((state) => state.userAuth.user);
-  const isLoading = useSelector((state) => state.userAuth.isLoading);
+  const [isLoading, setIsLoading] = useState(true);
+  const [userDetails, setUserDetails] = useState(null);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [activeField, setActiveField] = useState(null);
+  const [editValue, setEditValue] = useState('');
+
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    fetchUserDetails();
+  }, []);
+
+  const fetchUserDetails = async () => {
+    const response = await dispatch(getUserAsync(user.uid));
+    setUserDetails(response.payload);
+    setIsLoading(false);
+  }
+
+  const updateUserDetails = async (field, value) => {
+    const response = await dispatch(userUpdateAsync({...userDetails, [field]: value }));
+    fetchUserDetails();
+    setIsModalVisible(false);
+  }
 
   const handleLogout = () => {
     dispatch(signOutAsync());
+  };
+
+  const handleFieldUpdate = () => {
+    setIsModalVisible(false);
+  };
+
+  const openModal = (field, currentValue) => {
+    setActiveField(field);
+    setEditValue(currentValue || '');
+    setIsModalVisible(true);
+  };
+
+  const fieldConfigs = {
+    displayName: {
+      title: 'Update Name',
+      type: 'text',
+    },
+    age: {
+      title: 'Update Age',
+      type: 'number',
+    },
+    maritalStatus: {
+      title: 'Update Marital Status',
+      type: 'select',
+      options: ['Single', 'In a Relationship', 'Married', 'Divorced', 'Widowed'],
+    },
+    jobStatus: {
+      title: 'Update Job Status',
+      type: 'select',
+      options: ['Employed', 'Unemployed', 'Student', 'Retired'],
+    },
+    education: {
+      title: 'Update Education',
+      type: 'select',
+      options: ['High School', 'Bachelor', 'Master', 'PhD', 'Other'],
+    },
+  };
+
+  const copyReferralCode = async () => {
+    try {
+      await Clipboard.setStringAsync(user.referralCode);
+      Alert.alert('Success', 'Referral code copied to clipboard!');
+    } catch (error) {
+      Alert.alert('Error', 'Failed to copy referral code');
+    }
   };
 
   return (
@@ -31,54 +117,66 @@ const ProfileSettings = ({ navigation }) => {
       end={{ x: 1, y: 1 }}
     >
       <SafeAreaView style={styles.container}>
+        {isLoading && <Loading />}
         <ScrollView style={styles.scrollView}>
-          {isLoading && <Loading />}
+          {/* Back Button */}
+          <TouchableOpacity 
+            style={styles.backButton}
+            onPress={() => navigation.goBack()}
+          >
+            <Ionicons name="arrow-back" size={24} color="#fff" />
+          </TouchableOpacity>
+
           {/* Profile Header */}
           <View style={styles.header}>
             <Text style={styles.name}>
-              {user.displayName ? user.displayName : "Unknown"}
+              {userDetails?.displayName || "Unknown"}
             </Text>
             <Text style={styles.email}>
-              {user.email ? user.email : "Unknown"}
+              {userDetails?.email || "Unknown"}
             </Text>
           </View>
 
-          {/* Profile Sections */}
-          <View style={styles.formContent}>
-            {/* Name Section */}
-            <View style={styles.option}>
-              <Text style={styles.optionText}>Name: {user.displayName}</Text>
+          {/* Profile Sections - Only render when userDetails is available */}
+          {userDetails && (
+            <View style={styles.formContent}>
+              <SettingsTouchableOpacity user={userDetails} openModal={openModal} field_name="displayName" field_title="Name" />
+              <SettingsTouchableOpacity user={userDetails} openModal={openModal} field_name="age" field_title="Age" />
+              <SettingsTouchableOpacity user={userDetails} openModal={openModal} field_name="maritalStatus" field_title="Marital Status" />
+              <SettingsTouchableOpacity user={userDetails} openModal={openModal} field_name="jobStatus" field_title="Job Status" />
+              <SettingsTouchableOpacity user={userDetails} openModal={openModal} field_name="education" field_title="Education" />
+              
+              {/* Update Password Section */}
+              <TouchableOpacity
+                style={styles.option}
+                onPress={() => navigation.navigate("UpdatePassword")}
+              >
+                <Text style={styles.optionText}>Update Password</Text>
+                <Ionicons
+                  name="chevron-forward"
+                  size={24}
+                  color="rgba(255, 255, 255, 0.5)"
+                />
+              </TouchableOpacity>
+
+              {/* Referral Code Section */}
+              <TouchableOpacity style={styles.option} onPress={copyReferralCode}>
+                <Text style={styles.optionText}>Referral Code: {userDetails.referralCode}</Text>
+                <Ionicons name="copy-outline" size={24} color="rgba(255, 255, 255, 0.5)" />
+              </TouchableOpacity>
             </View>
-
-            {/* Update Password Section */}
-            <TouchableOpacity
-              style={styles.option}
-              onPress={() => navigation.navigate("UpdatePassword")}
-            >
-              <Text style={styles.optionText}>Update Password</Text>
-              <Ionicons
-                name="chevron-forward"
-                size={24}
-                color="rgba(255, 255, 255, 0.5)"
-              />
-            </TouchableOpacity>
-
-            {/* Referral Code Section */}
-            <View style={styles.option}>
-              <Text style={styles.optionText}>Referral Code: ABC123</Text>
-            </View>
-
-            {/* Token Balance Section */}
-            <View style={styles.option}>
-              <Text style={styles.optionText}>Token Balance: 100 Tokens</Text>
-            </View>
-          </View>
-
-          {/* Logout Button */}
-          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-            <Text style={styles.logoutText}>Çıkış</Text>
-          </TouchableOpacity>
+          )}
         </ScrollView>
+
+        <ProfileEditModal 
+          isVisible={isModalVisible}
+          onClose={() => setIsModalVisible(false)}
+          activeField={activeField}
+          fieldConfigs={fieldConfigs}
+          editValue={editValue}
+          setEditValue={setEditValue}
+          onUpdate={updateUserDetails}
+        />
       </SafeAreaView>
       <BottomNavigation navigation={navigation} pageName={"Profile"} />
     </LinearGradient>
@@ -118,7 +216,6 @@ const styles = StyleSheet.create({
   },
   option: {
     flexDirection: "row",
-    alignItems: "center",
     paddingVertical: 16,
     borderBottomWidth: 1,
     borderBottomColor: "rgba(255, 255, 255, 0.1)",
@@ -141,6 +238,13 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
+  },
+  backButton: {
+    position: 'absolute',
+    top: -5,
+    left: 0,
+    zIndex: 1,
+    padding: 8,
   },
 });
 

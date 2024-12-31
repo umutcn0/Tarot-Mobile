@@ -7,21 +7,49 @@ import {
   ScrollView,
   SafeAreaView,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import TopProfileBar from "../common/TopProfileBar";
 import BottomNavigation from "../../components/BottomNavigation";
+import { useDispatch, useSelector } from "react-redux";
+import { getUserAsync, userUpdateAsync } from "../../database/redux/slices/userSlice";
+import { Ionicons } from "@expo/vector-icons";
 
 const AppSettings = ({ navigation }) => {
-  const [language, setLanguage] = useState("English");
-  const [currency, setCurrency] = useState("USD");
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.userAuth.user);
+  const [userDetails, setUserDetails] = useState(null);
+  const [language, setLanguage] = useState("Turkish");
+  const [currency, setCurrency] = useState("TRY");
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedSetting, setSelectedSetting] = useState(null); // To track which setting is being edited
 
-  const handleSaveSettings = () => {
-    // Logic to save settings (e.g., update user profile in the database)
-    console.log(`Language: ${language}, Currency: ${currency}`);
-    setModalVisible(false); // Close modal after saving
+  useEffect(() => {
+    fetchUserDetails();
+  }, []);
+
+  const fetchUserDetails = async () => {
+    const response = await dispatch(getUserAsync(user.uid));
+    const details = response.payload;
+    setUserDetails(details);
+    setLanguage(details.language || "Türkçe");
+    setCurrency(details.currency || "TRY");
+  };
+
+  const handleSaveSettings = async () => {
+    try {
+      await dispatch(userUpdateAsync({
+        ...userDetails,
+        language,
+        currency
+      }));
+      // Refresh user details
+      await fetchUserDetails();
+      setModalVisible(false);
+    } catch (error) {
+      console.error("Error updating settings:", error);
+      // Optionally add error handling UI here
+    }
   };
 
   const openModal = (setting) => {
@@ -32,8 +60,10 @@ const AppSettings = ({ navigation }) => {
   const handleOptionSelect = (itemValue) => {
     if (selectedSetting === "language") {
       setLanguage(itemValue);
+      handleSaveSettings();
     } else if (selectedSetting === "currency") {
       setCurrency(itemValue);
+      handleSaveSettings();
     }
     setModalVisible(false); // Close modal after selection
   };
@@ -46,8 +76,13 @@ const AppSettings = ({ navigation }) => {
       end={{ x: 1, y: 1 }}
     >
       <SafeAreaView style={styles.container}>
-        <TopProfileBar navigation={navigation} />
         <ScrollView style={styles.scrollView}>
+          <TouchableOpacity 
+              style={styles.backButton}
+              onPress={() => navigation.goBack()}
+            >
+              <Ionicons name="arrow-back" size={24} color="#fff" />
+          </TouchableOpacity>
           <Text style={styles.title}>Ayarlar</Text>
 
           <View style={styles.formContent}>
@@ -65,18 +100,11 @@ const AppSettings = ({ navigation }) => {
               <Text style={styles.label}>Para Birimi:</Text>
               <TouchableOpacity
                 style={styles.settingOption}
-                onPress={() => openModal("Currency")}
+                onPress={() => openModal("currency")}
               >
                 <Text style={styles.label}>{currency}</Text>
               </TouchableOpacity>
             </View>
-
-            <TouchableOpacity
-              style={styles.saveButton}
-              onPress={handleSaveSettings}
-            >
-              <Text style={styles.saveButtonText}>Ayarları Kaydet</Text>
-            </TouchableOpacity>
           </View>
         </ScrollView>
       </SafeAreaView>
@@ -89,87 +117,66 @@ const AppSettings = ({ navigation }) => {
         visible={modalVisible}
         onRequestClose={() => setModalVisible(false)}
       >
-        <View style={styles.modalContainer}>
-          <LinearGradient
-            colors={["#1e1b4b", "#4a044e"]}
-            style={styles.modalContent}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
+        <TouchableOpacity 
+          style={styles.modalContainer}
+          activeOpacity={1}
+          onPress={() => setModalVisible(false)}
+        >
+          <TouchableOpacity 
+            activeOpacity={1}
+            onPress={(e) => e.stopPropagation()}
           >
-            <Text style={styles.modalTitle}>
-              Select {selectedSetting === "language" ? "Language" : "Currency"}
-            </Text>
-            <ScrollView style={styles.optionsContainer}>
-              {selectedSetting === "language" ? (
-                <>
-                  <TouchableOpacity
-                    onPress={() => handleOptionSelect("Turkish")}
-                    style={styles.option}
-                  >
-                    <Text style={styles.optionText}>Türkçe</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={() => handleOptionSelect("English")}
-                    style={styles.option}
-                  >
-                    <Text style={styles.optionText}>İngilizce</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={() => handleOptionSelect("Spanish")}
-                    style={styles.option}
-                  >
-                    <Text style={styles.optionText}>İspanyolca</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={() => handleOptionSelect("French")}
-                    style={styles.option}
-                  >
-                    <Text style={styles.optionText}>Fransızca</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={() => handleOptionSelect("German")}
-                    style={styles.option}
-                  >
-                    <Text style={styles.optionText}>Almanca</Text>
-                  </TouchableOpacity>
-                </>
-              ) : (
-                <>
-                  <TouchableOpacity
-                    onPress={() => handleOptionSelect("USD")}
-                    style={styles.option}
-                  >
-                    <Text style={styles.optionText}>USD</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={() => handleOptionSelect("EUR")}
-                    style={styles.option}
-                  >
-                    <Text style={styles.optionText}>EUR</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={() => handleOptionSelect("GBP")}
-                    style={styles.option}
-                  >
-                    <Text style={styles.optionText}>GBP</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={() => handleOptionSelect("TRY")}
-                    style={styles.option}
-                  >
-                    <Text style={styles.optionText}>TRY</Text>
-                  </TouchableOpacity>
-                </>
-              )}
-            </ScrollView>
-            <TouchableOpacity
-              style={styles.closeButton}
-              onPress={() => setModalVisible(false)}
+            <LinearGradient
+              colors={["#1e1b4b", "#4a044e"]}
+              style={styles.modalContent}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
             >
-              <Text style={styles.closeButtonText}>Close</Text>
-            </TouchableOpacity>
-          </LinearGradient>
-        </View>
+              <Text style={styles.modalTitle}>
+                Select {selectedSetting === "language" ? "Language" : "Currency"}
+              </Text>
+              <ScrollView style={styles.optionsContainer}>
+                {selectedSetting === "language" ? (
+                  <>
+                    <TouchableOpacity
+                      onPress={() => handleOptionSelect("Türkçe")}
+                      style={styles.option}
+                    >
+                      <Text style={styles.optionText}>Türkçe</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() => handleOptionSelect("English")}
+                      style={styles.option}
+                    >
+                      <Text style={styles.optionText}>English</Text>
+                    </TouchableOpacity>
+                  </>
+                ) : (
+                  <>
+                    <TouchableOpacity
+                      onPress={() => handleOptionSelect("USD")}
+                      style={styles.option}
+                    >
+                      <Text style={styles.optionText}>USD</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() => handleOptionSelect("EUR")}
+                      style={styles.option}
+                    >
+                      <Text style={styles.optionText}>EUR</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() => handleOptionSelect("TRY")}
+                      style={styles.option}
+                    >
+                      <Text style={styles.optionText}>TRY</Text>
+                    </TouchableOpacity>
+                  </>
+                )}
+              </ScrollView>
+            </LinearGradient>
+          </TouchableOpacity>
+        </TouchableOpacity>
       </Modal>
     </LinearGradient>
   );
@@ -226,7 +233,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalContent: {
-    width: "80%",
+    width: 300,
     borderRadius: 20,
     borderWidth: 1,
     borderColor: "rgba(255, 255, 255, 0.1)",
@@ -280,6 +287,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginBottom: 24,
     flex: 1,
+  },
+  backButton: {
+    position: 'absolute',
+    top: -5,
+    left: 0,
+    zIndex: 1,
+    padding: 8,
   },
 });
 

@@ -1,17 +1,38 @@
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native'
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView, SafeAreaView, Alert } from 'react-native'
 import React, { useState } from 'react'
 import { LinearGradient } from 'expo-linear-gradient'
-import TopProfileBar from '../common/TopProfileBar'
 import BottomNavigation from '../../components/BottomNavigation'
+import { createSupportTicket } from '../../services/supportServices'
+import { useSelector } from 'react-redux'
+import Loading from '../common/Loading'
+import { Ionicons } from "@expo/vector-icons";
 
 const Support = ({navigation}) => {
   const [problemDescription, setProblemDescription] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const user = useSelector((state) => state.userAuth.user);
 
-  const handleSubmit = () => {
-    // Here you would typically send the problemDescription to your backend or email service
-    console.log("Ticket submitted:", problemDescription);
-    // Reset the input field after submission
-    setProblemDescription('');
+  const handleSubmit = async () => {
+    if (!problemDescription.trim()) {
+      Alert.alert('Hata', 'Lütfen probleminizi belirtin.');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      await createSupportTicket(user.uid, user.email, problemDescription.trim());
+      Alert.alert('Başarılı', 'Destek talebiniz başarıyla gönderildi.');
+      setProblemDescription('');
+    } catch (error) {
+      if (error.message.includes('Daily ticket limit')) {
+        Alert.alert('Hata', 'Günlük destek talebi limitine ulaştınız (2 talep/gün).');
+      } else {
+        Alert.alert('Hata', 'Destek talebi gönderilirken bir hata oluştu.');
+      }
+      console.error('Support ticket error:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -22,9 +43,14 @@ const Support = ({navigation}) => {
       end={{ x: 1, y: 1 }}
     >
       <SafeAreaView style={styles.container}>
-        <TopProfileBar navigation={navigation} />
-
+        {isLoading && <Loading />}
         <ScrollView style={styles.scrollView}>
+          <TouchableOpacity 
+                style={styles.backButton}
+                onPress={() => navigation.goBack()}
+              >
+                <Ionicons name="arrow-back" size={24} color="#fff" />
+          </TouchableOpacity>
           <Text style={styles.title}>Destek</Text>
 
           <Text style={styles.label}>Lütfen probleminizi belirtin:</Text>
@@ -38,7 +64,11 @@ const Support = ({navigation}) => {
             placeholderTextColor="#ccc"
           />
 
-          <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+          <TouchableOpacity 
+            style={[styles.button, !problemDescription.trim() && styles.buttonDisabled]} 
+            onPress={handleSubmit}
+            disabled={!problemDescription.trim() || isLoading}
+          >
             <Text style={styles.buttonText}>Gönder</Text>
           </TouchableOpacity>
         </ScrollView>
@@ -72,12 +102,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     marginBottom: 20,
     color: '#fff',
+    textAlignVertical: 'top',
+    padding: 10,
   },
   button: {
     backgroundColor: '#B64B83',
     padding: 16,
     borderRadius: 10,
     alignItems: 'center',
+  },
+  buttonDisabled: {
+    opacity: 0.5,
   },
   buttonText: {
     color: '#fff',
@@ -86,6 +121,13 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     padding: 20,
+  },
+  backButton: {
+    position: 'absolute',
+    top: -5,
+    left: 0,
+    zIndex: 1,
+    padding: 8,
   },
 });
 

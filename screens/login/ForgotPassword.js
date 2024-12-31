@@ -13,15 +13,35 @@ import { LinearGradient } from 'expo-linear-gradient';
 import LoginTextInput from '../../components/LoginTextInput';
 import LoginButton from '../../components/LoginButton';
 import Loading from '../common/Loading';
-import { useSelector } from 'react-redux';
+import { sendPasswordResetEmail, getAuth, fetchSignInMethodsForEmail } from 'firebase/auth';
+import { Alert } from 'react-native';
+
+const auth = getAuth();
 
 const ForgotPassword = ({navigation}) => {
   const [email, setEmail] = useState('');
-  const { isLoading } = useSelector((state) => state.user);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleResetPassword = () => {
-    // TODO: Implement password reset logic
-    console.log('Reset password for:', email);
+  const handleResetPassword = async () => {
+    if (!email) {
+      Alert.alert('Error', 'Please enter your email address.');
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      await sendPasswordResetEmail(auth, email)
+      .then( () => {
+        Alert.alert('Success', 'Password reset email sent. Please check your inbox.');
+        navigation.navigate('Login');
+      })
+      .catch( (error) => {
+        Alert.alert('Error', 'Please check your email address and try again.');
+        console.error('Password reset error:', error);
+      });
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (

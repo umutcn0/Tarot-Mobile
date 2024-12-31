@@ -1,16 +1,29 @@
 import { StyleSheet, Text, View, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { LinearGradient } from 'expo-linear-gradient'
 import { Ionicons } from '@expo/vector-icons'
 import { signOutAsync } from '../../database/redux/slices/userAuthSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import Loading from '../common/Loading';
 import BottomNavigation from '../../components/BottomNavigation';
+import { getUserAsync } from '../../database/redux/slices/userSlice';
 
 const Profile = ({navigation}) => {
   const user = useSelector((state) => state.userAuth.user);
   const isLoading = useSelector((state) => state.userAuth.isLoading);
   const dispatch = useDispatch();
+  const [userDetails, setUserDetails] = useState(null);
+  const [isLoadingDetails, setIsLoadingDetails] = useState(true);
+
+  useEffect(() => {
+    fetchUserDetails();
+  }, []);
+
+  const fetchUserDetails = async () => {
+    const response = await dispatch(getUserAsync(user.uid));
+    setUserDetails(response.payload);
+    setIsLoadingDetails(false);
+  }
 
   const handleLogout = () => {
     try {
@@ -28,7 +41,7 @@ const Profile = ({navigation}) => {
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
     >
-      {isLoading && <Loading/>}
+      {(isLoading || isLoadingDetails) && <Loading/>}
       <SafeAreaView style={styles.container}>
         <ScrollView style={styles.scrollView}>
           {/* Profile Header */}
@@ -36,8 +49,8 @@ const Profile = ({navigation}) => {
             <TouchableOpacity style={styles.avatarContainer}>
               <Ionicons name="planet" size={80} color="#fff" />
             </TouchableOpacity>
-            <Text style={styles.name}>{user.displayName ? user.displayName : "Unknown"}</Text>
-            <Text style={styles.email}>{user.email ? user.email : "Unknown"}</Text>
+            <Text style={styles.name}>{userDetails?.displayName || "Unknown"}</Text>
+            <Text style={styles.email}>{userDetails?.email || "Unknown"}</Text>
           </View>
 
           {/* Profile Options */}

@@ -2,7 +2,8 @@ import { KeyboardAvoidingView, StyleSheet, Text, View,
   TouchableOpacity,
   TouchableWithoutFeedback,
   Keyboard,
-  Platform
+  Platform,
+  Alert
  } from 'react-native'
 import React from 'react'
 import { signUpAsync } from '../../database/redux/slices/userAuthSlice';
@@ -36,6 +37,7 @@ const SignUp = ({navigation}) => {
 
       await dispatch(userAddAsync(userData));
     } catch (error) {
+      Alert.alert('Error', 'Please check your email address and try again.');
       console.log(error);
     }
 }

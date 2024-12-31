@@ -1,7 +1,13 @@
 import {getAuth} from 'firebase/auth'
 import Config from 'react-native-config';
 
-const SERVER_URL = __DEV__ ? Config.API_SERVER_DEV_URL : Config.API_SERVER_URL;
+const SERVER_URL = __DEV__ 
+  ? Config.API_SERVER_DEV_URL || 'http://localhost:8000'  // fallback dev URL
+  : Config.API_SERVER_URL || 'https://api.yourproduction.com';  // fallback prod URL
+
+if (!SERVER_URL) {
+  console.error('SERVER_URL is not properly configured. Check your environment variables.');
+}
 
 const auth = getAuth();
 
@@ -36,6 +42,7 @@ export const sendFortune = async (items, userId) => {
       }
 
       console.log(request_body)
+      console.log(SERVER_URL)
 
       const response = await fetch(
         `${SERVER_URL}/api/chat-test`,
