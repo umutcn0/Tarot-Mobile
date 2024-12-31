@@ -15,9 +15,11 @@ const TopProfileBar = ({navigation}) => {
         const getUserData = async () => {
             try {
                 setLoading(true);
-                const token_data = await getUserToken(user.uid);
-                if (token_data) {
-                    setcoinAmount(token_data);
+                if (user && user.uid) {
+                    const token_data = await getUserToken(user.uid);
+                    if (token_data) {
+                        setcoinAmount(token_data);
+                    }
                 }
             } catch (error) {
                 console.error('Error loading user data:', error);
@@ -28,7 +30,7 @@ const TopProfileBar = ({navigation}) => {
         };
 
         getUserData();
-    }, [user.uid]);
+    }, [user?.uid]);
 
     return (
         <View style={styles.header}>

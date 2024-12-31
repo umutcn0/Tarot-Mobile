@@ -69,12 +69,6 @@
           ]
         }
       ]
-    ],
-    "extra": {
-      "eas": {
-        "projectId": "56b88bd4-976c-4c09-8e26-58d27f74d43a"
-      }
-    },
-    "owner": "capsiel"
+    ]
   }
 }
