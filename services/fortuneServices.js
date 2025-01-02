@@ -3,7 +3,8 @@ import {
   collection,
   getDocs,
   query,
-  where
+  where,
+  orderBy,
 } from "firebase/firestore";
 import { useSelector } from "react-redux";
 
@@ -28,7 +29,7 @@ export const getFortune = async (userId, fortuneId) => {
  * @returns {Promise<Array<Object>>} An array of fortunes
  */
 export const getFortuneHistory = async (userId) => {
-  const q = query(fortuneCollection, where("user_id", "==", userId));
+  const q = query(fortuneCollection, where("user_id", "==", userId), orderBy("created_at", "desc"));
   const querySnapshot = await getDocs(q);
   const fortunes = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
   return fortunes;

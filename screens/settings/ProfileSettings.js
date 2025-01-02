@@ -5,20 +5,17 @@ import {
   TouchableOpacity,
   ScrollView,
   SafeAreaView,
-  Modal,
-  TextInput,
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
-import { signOutAsync } from "../../database/redux/slices/userAuthSlice";
 import { useDispatch, useSelector } from "react-redux";
 import Loading from "../common/Loading";
 import BottomNavigation from "../../components/BottomNavigation";
 import { getUserAsync, userUpdateAsync } from "../../database/redux/slices/userSlice";
 import * as Clipboard from 'expo-clipboard';
 import { Alert } from 'react-native';
-import ProfileEditModal from '../../components/ProfileEditModal';
+import EditModal from '../../components/EditModal';
 
 
 const SettingsTouchableOpacity = ({user, openModal, field_name, field_title}) => {
@@ -59,14 +56,6 @@ const ProfileSettings = ({ navigation }) => {
     fetchUserDetails();
     setIsModalVisible(false);
   }
-
-  const handleLogout = () => {
-    dispatch(signOutAsync());
-  };
-
-  const handleFieldUpdate = () => {
-    setIsModalVisible(false);
-  };
 
   const openModal = (field, currentValue) => {
     setActiveField(field);
@@ -168,9 +157,9 @@ const ProfileSettings = ({ navigation }) => {
           )}
         </ScrollView>
 
-        <ProfileEditModal 
+        <EditModal 
           isVisible={isModalVisible}
-          onClose={() => setIsModalVisible(false)}
+          onRequestClose={() => setIsModalVisible(false)}
           activeField={activeField}
           fieldConfigs={fieldConfigs}
           editValue={editValue}
@@ -178,7 +167,7 @@ const ProfileSettings = ({ navigation }) => {
           onUpdate={updateUserDetails}
         />
       </SafeAreaView>
-      <BottomNavigation navigation={navigation} pageName={"Profile"} />
+      <BottomNavigation navigation={navigation} pageName="Profile" />
     </LinearGradient>
   );
 };

@@ -108,7 +108,7 @@ const Token = ({ navigation }) => {
           </View>
         </ScrollView>
       </SafeAreaView>
-      <BottomNavigation navigation={navigation} pageName="TokenBuy" />
+      <BottomNavigation navigation={navigation} pageName="Token" />
     </LinearGradient>
   );
 };

@@ -10,9 +10,9 @@ import {
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 
-const ProfileEditModal = ({ 
+const EditModal = ({ 
   isVisible, 
-  onClose, 
+  onRequestClose, 
   activeField, 
   fieldConfigs, 
   editValue, 
@@ -24,12 +24,12 @@ const ProfileEditModal = ({
       animationType="fade"
       transparent={true}
       visible={isVisible}
-      onRequestClose={onClose}
+      onRequestClose={onRequestClose}
     >
       <TouchableOpacity 
         style={styles.modalContainer} 
         activeOpacity={1} 
-        onPress={onClose}
+        onPress={onRequestClose}
       >
         <TouchableOpacity 
           activeOpacity={1} 
@@ -151,4 +151,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ProfileEditModal; 
+export default EditModal; 

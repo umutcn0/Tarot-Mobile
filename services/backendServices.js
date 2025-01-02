@@ -1,9 +1,8 @@
 import {getAuth} from 'firebase/auth'
-import Config from 'react-native-config';
 
 const SERVER_URL = __DEV__ 
-  ? Config.API_SERVER_DEV_URL || 'http://localhost:8000'  // fallback dev URL
-  : Config.API_SERVER_URL || 'https://api.yourproduction.com';  // fallback prod URL
+  ? process.env.EXPO_PUBLIC_API_SERVER_DEV_URL || 'http://localhost:8000'  // fallback dev URL
+  : process.env.EXPO_PUBLIC_API_SERVER_URL || 'https://api.yourproduction.com';  // fallback prod URL
 
 if (!SERVER_URL) {
   console.error('SERVER_URL is not properly configured. Check your environment variables.');

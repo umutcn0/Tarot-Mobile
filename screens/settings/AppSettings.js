@@ -1,0 +1,171 @@
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  ScrollView,
+  SafeAreaView,
+} from "react-native";
+import React, { useState, useEffect } from "react";
+import { LinearGradient } from "expo-linear-gradient";
+import BottomNavigation from "../../components/BottomNavigation";
+import { useDispatch, useSelector } from "react-redux";
+import { getUserAsync, userUpdateAsync } from "../../database/redux/slices/userSlice";
+import { Ionicons } from "@expo/vector-icons";
+import EditModal from "../../components/EditModal";
+import Loading from "../common/Loading";
+
+const AppSettingsTouchableOpacity = ({user, openModal, field_name, field_title}) => {
+  if (!user) return null;
+  
+  return (
+    <TouchableOpacity style={styles.option}
+      onPress={() => openModal(field_name, user[field_name])}
+    >
+      <Text style={styles.optionText}>{field_title}: {user[field_name] || "Not set"}</Text>
+      <Ionicons name="chevron-forward" size={24} color="rgba(255, 255, 255, 0.5)" />
+    </TouchableOpacity>
+  )
+}
+
+
+const AppSettings = ({ navigation }) => {
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.userAuth.user);
+  const [isLoading, setIsLoading] = useState(true);
+  const [userDetails, setUserDetails] = useState(null);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [activeField, setActiveField] = useState(null);
+  const [editValue, setEditValue] = useState('');
+
+  const fieldConfigs = {
+    language: {
+      title: 'Language',
+      type: 'select',
+      options: ['Turkish', 'English', 'Spanish', 'French', 'German'],
+    },
+    currency: {
+      title: 'Currency',
+      type: 'select',
+      options: ['TRY', 'USD', 'EUR'],
+    },
+  };
+
+  useEffect(() => {
+    fetchUserDetails();
+  }, []);
+
+  const fetchUserDetails = async () => {
+    const response = await dispatch(getUserAsync(user.uid));
+    setUserDetails(response.payload);
+    setIsLoading(false);
+  };
+
+  const updateUserDetails = async (field, value) => {
+    await dispatch(userUpdateAsync({...userDetails, [field]: value }));
+    fetchUserDetails();
+    setIsModalVisible(false);
+  }
+
+  const openModal = (field) => {
+    setActiveField(field);
+    setIsModalVisible(true);
+  };
+
+  return (
+    <LinearGradient
+      colors={["#1e1b4b", "#4a044e", "#3b0764"]}
+      style={styles.container}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+    >
+      {isLoading && <Loading />}
+      <SafeAreaView style={styles.container}>
+        <ScrollView style={styles.scrollView}>
+          <TouchableOpacity 
+              style={styles.backButton}
+              onPress={() => navigation.goBack()}
+            >
+              <Ionicons name="arrow-back" size={24} color="#fff" />
+          </TouchableOpacity>
+          <Text style={styles.title}>Genel Ayarlar</Text>
+
+          <View style={styles.formContent}>
+            {userDetails && (
+              <>
+                <AppSettingsTouchableOpacity
+                  user={userDetails}
+                  openModal={openModal}
+                  field_name="language"
+                  field_title="Dil"
+            />
+            <AppSettingsTouchableOpacity
+                  user={userDetails}
+                  openModal={openModal}
+                  field_name="currency"
+                  field_title="Para Birimi"
+                />
+              </>
+            )}
+          </View>
+        </ScrollView>
+        <EditModal
+          isVisible={isModalVisible}
+          onRequestClose={() => setIsModalVisible(false)}
+          activeField={activeField}
+          fieldConfigs={fieldConfigs}
+          editValue={editValue}
+          setEditValue={setEditValue}
+          onUpdate={updateUserDetails}
+        />
+      </SafeAreaView>
+      <BottomNavigation navigation={navigation} pageName="Profile" />
+    </LinearGradient>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  scrollView: {
+    padding: 16,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#fff",
+    marginBottom: 20,
+    textAlign: "center",
+  },
+  option: {
+    flexDirection: "row",
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(255, 255, 255, 0.1)",
+  },
+  optionText: {
+    flex: 1,
+    fontSize: 16,
+    marginLeft: 15,
+    color: "#fff",
+  },
+  formContent: {
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
+    borderColor: "rgba(255, 255, 255, 0.2)",
+    borderRadius: 24,
+    padding: 16,
+    borderWidth: 1,
+    marginBottom: 24,
+    flex: 1,
+  },
+  backButton: {
+    position: 'absolute',
+    top: -5,
+    left: 0,
+    zIndex: 1,
+    padding: 8,
+  },
+});
+
+export default AppSettings;

@@ -8,8 +8,11 @@ const FaithFortune = ({navigation}) => {
   const [intent, setIntent] = useState('');
 
   const handleContinue = () => {
-    // Navigate to CardSelection with the intent as a parameter
-    navigation.navigate('CardSelection', { userIntent: intent });
+    if (intent.length > 10) {
+      navigation.navigate('CardSelection', { userIntent: intent });
+    } else {
+      Alert.alert('Lütfen en az 10 karakter giriniz');
+    }
   };
 
   return (
@@ -20,19 +23,19 @@ const FaithFortune = ({navigation}) => {
       end={{ x: 1, y: 1 }}
     >
       <View style={styles.innerContainer}>
-        <Text style={styles.title}>What is your intent?</Text>
+        <Text style={styles.title}>Lütfen niyetinizi giriniz</Text>
         <TextInput
           style={styles.input}
-          placeholder="Type your intent here..."
+          placeholder="Niyetinizi giriniz..."
           value={intent}
           onChangeText={setIntent}
         />
         <TouchableOpacity
-          style={styles.button}
+          style={[intent.length > 10 ? styles.enabledButton : styles.disabledButton, styles.button]}
           onPress={handleContinue}
           disabled={!intent}
         >
-          <Text style={styles.buttonText}>Continue to Card Selection</Text>
+          <Text style={styles.buttonText}>Devam Et</Text>
         </TouchableOpacity>
       </View>
       <BottomNavigation navigation={navigation} pageName="IntentInput" />
@@ -65,10 +68,16 @@ const styles = StyleSheet.create({
     color: '#fff',
   },
   button: {
-    backgroundColor: '#B64B83',
     padding: 16,
     borderRadius: 10,
     alignItems: 'center',
+  },
+  enabledButton: {
+    backgroundColor: '#B64B83',
+  },
+  disabledButton: {
+    backgroundColor: 'gray',
+    opacity: 0.5,
   },
   buttonText: {
     color: '#fff',

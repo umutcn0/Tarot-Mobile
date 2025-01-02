@@ -73,7 +73,7 @@ const Support = ({navigation}) => {
           </TouchableOpacity>
         </ScrollView>
       </SafeAreaView>
-      <BottomNavigation navigation={navigation} pageName="Support"/>
+      <BottomNavigation navigation={navigation} pageName="Profile"/>
     </LinearGradient>
   )
 }
@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
   input: {
     height: 100,
     borderColor: '#ccc',
-    borderWidth: 1,
+    borderWidth: 0.5,
     borderRadius: 10,
     paddingHorizontal: 10,
     marginBottom: 20,
@@ -112,6 +112,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   buttonDisabled: {
+    backgroundColor: 'gray',
     opacity: 0.5,
   },
   buttonText: {

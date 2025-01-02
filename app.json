@@ -21,7 +21,8 @@
       [
         "react-native-google-mobile-ads",
         {
-          "androidAppId": "ca-app-pub-4666300760854612/5031399665",
+          "android_app_id": "ca-app-pub-4666300760854612~5031399665",
+          "androidAppId": "ca-app-pub-4666300760854612~5031399665",
           "iosAppId": "ca-app-pub-4666300760854612~3087762609",
           "skAdNetworkItems": [
             "cstr6suwn9.skadnetwork",
@@ -69,6 +70,16 @@
           ]
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "56b88bd4-976c-4c09-8e26-58d27f74d43a"
+      }
+    },
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    }
   }
 }

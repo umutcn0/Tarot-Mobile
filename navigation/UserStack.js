@@ -2,7 +2,7 @@ import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { Home, History, Profile, Token } from "../screens/home";
 import { CardSelection, FaithFortune, FortuneDetail } from "../screens/fortunes";
-import { AppSettings, ProfileSettings, Support } from "../screens/profile";
+import { AppSettings, ProfileSettings, Support } from "../screens/settings";
 import { RewardedAds } from "../screens/ads";
 
 const Stack = createNativeStackNavigator();

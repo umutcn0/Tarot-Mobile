@@ -59,7 +59,7 @@ export const signUpAsync = createAsyncThunk(
 
       const userData = {
         ...userModel,
-        id: user.uid,
+        uid: user.uid,
         email: user.email,
         emailVerified: user.emailVerified,
         displayName: user.displayName || null,
