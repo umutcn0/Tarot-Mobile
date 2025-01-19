@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import Loading from '../common/Loading';
 import BottomNavigation from '../../components/BottomNavigation';
 import { getUserAsync } from '../../database/redux/slices/userSlice';
-
+import ScreenWrapper from '../../components/ScreenWrapper';
 const Profile = ({navigation}) => {
   const user = useSelector((state) => state.userAuth.user);
   const isLoading = useSelector((state) => state.userAuth.isLoading);
@@ -35,12 +35,7 @@ const Profile = ({navigation}) => {
   }
 
   return (
-    <LinearGradient
-      colors={['#1e1b4b', '#4a044e', '#3b0764']}
-      style={styles.container}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
-    >
+    <ScreenWrapper navigation={navigation} pageName="Profile">
       {(isLoading || isLoadingDetails) && <Loading/>}
       <SafeAreaView style={styles.container}>
         <ScrollView style={styles.scrollView}>
@@ -86,8 +81,7 @@ const Profile = ({navigation}) => {
           </TouchableOpacity>
         </ScrollView>
       </SafeAreaView>
-      <BottomNavigation navigation={navigation} pageName={"Profile"}/>
-    </LinearGradient>
+    </ScreenWrapper>
   )
 }
 

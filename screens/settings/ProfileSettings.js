@@ -14,9 +14,9 @@ import Loading from "../common/Loading";
 import BottomNavigation from "../../components/BottomNavigation";
 import { getUserAsync, userUpdateAsync } from "../../database/redux/slices/userSlice";
 import * as Clipboard from 'expo-clipboard';
-import { Alert } from 'react-native';
 import EditModal from '../../components/EditModal';
-
+import useAlert from '../../hooks/useAlert';
+import ScreenWrapper from "../../components/ScreenWrapper";
 
 const SettingsTouchableOpacity = ({user, openModal, field_name, field_title}) => {
   if (!user) return null;
@@ -38,6 +38,7 @@ const ProfileSettings = ({ navigation }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [activeField, setActiveField] = useState(null);
   const [editValue, setEditValue] = useState('');
+  const alert = useAlert();
 
   const dispatch = useDispatch();
 
@@ -65,46 +66,41 @@ const ProfileSettings = ({ navigation }) => {
 
   const fieldConfigs = {
     displayName: {
-      title: 'Update Name',
+      title: 'İsmi Güncelle',
       type: 'text',
     },
     age: {
-      title: 'Update Age',
+      title: 'Yaşı Güncelle',
       type: 'number',
     },
     maritalStatus: {
-      title: 'Update Marital Status',
+      title: 'Medeni Durumunu Güncelle',
       type: 'select',
       options: ['Single', 'In a Relationship', 'Married', 'Divorced', 'Widowed'],
     },
     jobStatus: {
-      title: 'Update Job Status',
+      title: 'İş Durumunu Güncelle',
       type: 'select',
       options: ['Employed', 'Unemployed', 'Student', 'Retired'],
     },
     education: {
-      title: 'Update Education',
+      title: 'Eğitim Durumunu Güncelle',
       type: 'select',
       options: ['High School', 'Bachelor', 'Master', 'PhD', 'Other'],
     },
   };
 
-  const copyReferralCode = async () => {
+  const copyToClipboard = async (text) => {
     try {
-      await Clipboard.setStringAsync(user.referralCode);
-      Alert.alert('Success', 'Referral code copied to clipboard!');
+      await Clipboard.setStringAsync(text);
+      alert('Başarılı', 'Referans kodu panoya kopyalandı!');
     } catch (error) {
-      Alert.alert('Error', 'Failed to copy referral code');
+      alert('Hata', 'Referans kodu kopyalanamadı');
     }
   };
 
   return (
-    <LinearGradient
-      colors={["#1e1b4b", "#4a044e", "#3b0764"]}
-      style={styles.container}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
-    >
+    <ScreenWrapper navigation={navigation} pageName="ProfileSettings">
       <SafeAreaView style={styles.container}>
         {isLoading && <Loading />}
         <ScrollView style={styles.scrollView}>
@@ -129,28 +125,28 @@ const ProfileSettings = ({ navigation }) => {
           {/* Profile Sections - Only render when userDetails is available */}
           {userDetails && (
             <View style={styles.formContent}>
-              <SettingsTouchableOpacity user={userDetails} openModal={openModal} field_name="displayName" field_title="Name" />
-              <SettingsTouchableOpacity user={userDetails} openModal={openModal} field_name="age" field_title="Age" />
-              <SettingsTouchableOpacity user={userDetails} openModal={openModal} field_name="maritalStatus" field_title="Marital Status" />
-              <SettingsTouchableOpacity user={userDetails} openModal={openModal} field_name="jobStatus" field_title="Job Status" />
-              <SettingsTouchableOpacity user={userDetails} openModal={openModal} field_name="education" field_title="Education" />
+              <SettingsTouchableOpacity user={userDetails} openModal={openModal} field_name="displayName" field_title="İsim" />
+              <SettingsTouchableOpacity user={userDetails} openModal={openModal} field_name="age" field_title="Yaş" />
+              <SettingsTouchableOpacity user={userDetails} openModal={openModal} field_name="maritalStatus" field_title="Medeni Durum" />
+              <SettingsTouchableOpacity user={userDetails} openModal={openModal} field_name="jobStatus" field_title="İş Durum" />
+              <SettingsTouchableOpacity user={userDetails} openModal={openModal} field_name="education" field_title="Eğitim Durum" />
               
-              {/* Update Password Section */}
+              {/* Update Password Section 
               <TouchableOpacity
                 style={styles.option}
                 onPress={() => navigation.navigate("UpdatePassword")}
               >
-                <Text style={styles.optionText}>Update Password</Text>
+                <Text style={styles.optionText}>Şifreni Güncelle</Text>
                 <Ionicons
                   name="chevron-forward"
                   size={24}
                   color="rgba(255, 255, 255, 0.5)"
                 />
               </TouchableOpacity>
-
+              */}
               {/* Referral Code Section */}
-              <TouchableOpacity style={styles.option} onPress={copyReferralCode}>
-                <Text style={styles.optionText}>Referral Code: {userDetails.referralCode}</Text>
+              <TouchableOpacity style={styles.option} onPress={() => copyToClipboard(userDetails.referralCode)}>
+                <Text style={styles.optionText}>Referans Kodu: {userDetails.referralCode}</Text>
                 <Ionicons name="copy-outline" size={24} color="rgba(255, 255, 255, 0.5)" />
               </TouchableOpacity>
             </View>
@@ -167,8 +163,7 @@ const ProfileSettings = ({ navigation }) => {
           onUpdate={updateUserDetails}
         />
       </SafeAreaView>
-      <BottomNavigation navigation={navigation} pageName="Profile" />
-    </LinearGradient>
+    </ScreenWrapper>
   );
 };
 

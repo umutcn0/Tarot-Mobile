@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView, SafeAreaView, Alert } from 'react-native'
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native'
 import React, { useState } from 'react'
 import { LinearGradient } from 'expo-linear-gradient'
 import BottomNavigation from '../../components/BottomNavigation'
@@ -6,28 +6,30 @@ import { createSupportTicket } from '../../services/supportServices'
 import { useSelector } from 'react-redux'
 import Loading from '../common/Loading'
 import { Ionicons } from "@expo/vector-icons";
-
+import useAlert from '../../hooks/useAlert';
+import ScreenWrapper from '../../components/ScreenWrapper';
 const Support = ({navigation}) => {
   const [problemDescription, setProblemDescription] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const user = useSelector((state) => state.userAuth.user);
+  const alert = useAlert();
 
   const handleSubmit = async () => {
     if (!problemDescription.trim()) {
-      Alert.alert('Hata', 'Lütfen probleminizi belirtin.');
+      alert('Hata', 'Lütfen probleminizi belirtin.');
       return;
     }
 
     setIsLoading(true);
     try {
       await createSupportTicket(user.uid, user.email, problemDescription.trim());
-      Alert.alert('Başarılı', 'Destek talebiniz başarıyla gönderildi.');
+      alert('Başarılı', 'Destek talebiniz başarıyla gönderildi.');
       setProblemDescription('');
     } catch (error) {
       if (error.message.includes('Daily ticket limit')) {
-        Alert.alert('Hata', 'Günlük destek talebi limitine ulaştınız (2 talep/gün).');
+        alert('Hata', 'Günlük destek talebi limitine ulaştınız (2 talep/gün).');
       } else {
-        Alert.alert('Hata', 'Destek talebi gönderilirken bir hata oluştu.');
+        alert('Hata', 'Destek talebi gönderilirken bir hata oluştu.');
       }
       console.error('Support ticket error:', error);
     } finally {
@@ -36,12 +38,7 @@ const Support = ({navigation}) => {
   };
 
   return (
-    <LinearGradient
-      colors={['#1e1b4b', '#4a044e', '#3b0764']}
-      style={styles.container}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
-    >
+    <ScreenWrapper navigation={navigation} pageName="Support">
       <SafeAreaView style={styles.container}>
         {isLoading && <Loading />}
         <ScrollView style={styles.scrollView}>
@@ -73,8 +70,7 @@ const Support = ({navigation}) => {
           </TouchableOpacity>
         </ScrollView>
       </SafeAreaView>
-      <BottomNavigation navigation={navigation} pageName="Profile"/>
-    </LinearGradient>
+    </ScreenWrapper>
   )
 }
 

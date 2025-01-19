@@ -18,7 +18,7 @@ import {
 import Loading from "../common/Loading";
 import { useSelector } from 'react-redux';
 import { updateUserToken } from "../../services/tokenServices";
-
+import ScreenWrapper from '../../components/ScreenWrapper';
 
 const DisableAds = ({ tokenAmount, price }) => {
   return (
@@ -31,24 +31,21 @@ const DisableAds = ({ tokenAmount, price }) => {
 
 const Token = ({ navigation }) => {
   const [loaded, setLoaded] = useState(true);
-  const [rewardedAd, setRewardedAd] = useState(null);
-  const [adShown, setAdShown] = useState(false);
   const user = useSelector((state) => state.userAuth.user);
 
   const loadAd = () => {
     setLoaded(false);
-    const adUnitId = __DEV__
-      ? TestIds.REWARDED
-      : "ca-app-pub-4666300760854612/5031399665";
+    const adUnitId = "ca-app-pub-4666300760854612/5031399665";
 
-    const rewardedAd = RewardedAd.createForAdRequest(adUnitId);
-    setRewardedAd(rewardedAd);
+    const rewardedAd = RewardedAd.createForAdRequest(adUnitId, {
+      requestNonPersonalizedAdsOnly: true,
+    });
 
     const unsubscribeLoaded = rewardedAd.addAdEventListener(
       RewardedAdEventType.LOADED,
       () => {
         setLoaded(true);
-        rewardedAd.show(); // Show ad once loaded
+        rewardedAd.show();
       }
     );
 
@@ -64,18 +61,13 @@ const Token = ({ navigation }) => {
     rewardedAd.load();
 
     return () => {
-      unsubscribeLoaded();
-      unsubscribeEarned();
+      if (unsubscribeLoaded) unsubscribeLoaded();
+      if (unsubscribeEarned) unsubscribeEarned();
     };
   };
 
   return (
-    <LinearGradient
-      colors={["#1e1b4b", "#4a044e", "#3b0764"]}
-      style={styles.container}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
-    >
+    <ScreenWrapper navigation={navigation} pageName="Token">
       {!loaded && <Loading />}
       <SafeAreaView style={styles.container}>
         <TopProfileBar navigation={navigation} />
@@ -100,7 +92,6 @@ const Token = ({ navigation }) => {
               style={styles.earnButton}
               onPress={() => {
                 loadAd(); // Load and show ad when button is clicked
-                setAdShown(true);
               }}
             >
               <Text style={styles.earnButtonText}>Token Kazan</Text>
@@ -108,8 +99,7 @@ const Token = ({ navigation }) => {
           </View>
         </ScrollView>
       </SafeAreaView>
-      <BottomNavigation navigation={navigation} pageName="Token" />
-    </LinearGradient>
+    </ScreenWrapper>
   );
 };
 

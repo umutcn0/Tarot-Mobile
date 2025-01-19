@@ -14,7 +14,7 @@ import { getUserAsync, userUpdateAsync } from "../../database/redux/slices/userS
 import { Ionicons } from "@expo/vector-icons";
 import EditModal from "../../components/EditModal";
 import Loading from "../common/Loading";
-
+import ScreenWrapper from "../../components/ScreenWrapper";
 const AppSettingsTouchableOpacity = ({user, openModal, field_name, field_title}) => {
   if (!user) return null;
   
@@ -40,14 +40,14 @@ const AppSettings = ({ navigation }) => {
 
   const fieldConfigs = {
     language: {
-      title: 'Language',
+      title: 'Dil',
       type: 'select',
-      options: ['Turkish', 'English', 'Spanish', 'French', 'German'],
+      options: ['Türkçe'],
     },
     currency: {
-      title: 'Currency',
+      title: 'Para Birimi',
       type: 'select',
-      options: ['TRY', 'USD', 'EUR'],
+      options: ['TRY'],
     },
   };
 
@@ -73,12 +73,7 @@ const AppSettings = ({ navigation }) => {
   };
 
   return (
-    <LinearGradient
-      colors={["#1e1b4b", "#4a044e", "#3b0764"]}
-      style={styles.container}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
-    >
+    <ScreenWrapper navigation={navigation} pageName="AppSettings">
       {isLoading && <Loading />}
       <SafeAreaView style={styles.container}>
         <ScrollView style={styles.scrollView}>
@@ -119,8 +114,7 @@ const AppSettings = ({ navigation }) => {
           onUpdate={updateUserDetails}
         />
       </SafeAreaView>
-      <BottomNavigation navigation={navigation} pageName="Profile" />
-    </LinearGradient>
+    </ScreenWrapper>
   );
 };
 

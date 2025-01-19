@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native'
+import { StyleSheet, Text, View, TouchableOpacity, ScrollView, SafeAreaView, RefreshControl } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { LinearGradient } from 'expo-linear-gradient'
 import BottomNavigation from '../../components/BottomNavigation';
@@ -7,37 +7,53 @@ import { getFortuneHistory } from '../../services/fortuneServices';
 import { useSelector } from 'react-redux';
 import HistoryItem from '../../components/HistoryItem';
 import Loading from '../common/Loading';
+import { useAlert } from '../../hooks/useAlert';
+import ScreenWrapper from '../../components/ScreenWrapper';
 
 const History = ({ navigation }) => {
   const [historyItems, setHistoryItems] = useState([]);
   const user = useSelector((state) => state.userAuth.user);
   const [isLoading, setIsLoading] = useState(true);
+  const alert = useAlert();
+  const [refreshing, setRefreshing] = useState(false);
+
+  const fetchHistory = async () => {
+    try {
+      const history = await getFortuneHistory(user.uid);
+      setHistoryItems(history);
+      setIsLoading(false);
+      setRefreshing(false);
+    } catch (error) {
+      alert('Hata', 'Fal geçmişi alırken bir hata oluştu');
+      console.error('Error fetching fortune history:', error);
+      setRefreshing(false);
+    }
+  };
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    fetchHistory();
+  }, []);
 
   useEffect(() => {
-    const fetchHistory = async () => {
-      try {
-        const history = await getFortuneHistory(user.uid);
-        setHistoryItems(history);
-        setIsLoading(false);
-      } catch (error) {
-        console.error('Error fetching fortune history:', error);
-      }
-    };
-
     fetchHistory();
   }, []);
 
   return (
-    <LinearGradient
-      colors={['#1e1b4b', '#4a044e', '#3b0764']}
-      style={styles.container}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
-    >
+    <ScreenWrapper navigation={navigation} pageName="History">
       {isLoading && <Loading/>}
       <SafeAreaView style={styles.container}>
         <TopProfileBar navigation={navigation} />
-        <ScrollView style={styles.scrollView}>
+        <ScrollView 
+          style={styles.scrollView}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor="#ffffff"
+            />
+          }
+        >
           {historyItems.map((item, index) => (
             <HistoryItem
               key={index}
@@ -48,8 +64,7 @@ const History = ({ navigation }) => {
           ))}
         </ScrollView>
       </SafeAreaView>
-      <BottomNavigation navigation={navigation} pageName="History"/>
-    </LinearGradient>
+    </ScreenWrapper>
   );
 };
 

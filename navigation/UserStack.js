@@ -3,13 +3,21 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { Home, History, Profile, Token } from "../screens/home";
 import { CardSelection, FaithFortune, FortuneDetail } from "../screens/fortunes";
 import { AppSettings, ProfileSettings, Support } from "../screens/settings";
-import { RewardedAds } from "../screens/ads";
+import { VerifyEmail } from "../screens/login";
+import { useSelector } from "react-redux";
 
 const Stack = createNativeStackNavigator();
 
 const UserStack = () => {
+  const emailVerified = useSelector((state) => state.userAuth.emailVerified);
+
   return (
-    <Stack.Navigator>
+    <Stack.Navigator initialRouteName={emailVerified ? "Home" : "VerifyEmail"}>
+      <Stack.Screen
+        name="VerifyEmail"
+        component={VerifyEmail}
+        options={{ headerShown: false }}
+      />
       <Stack.Screen
         name="Home"
         component={Home}
@@ -53,11 +61,6 @@ const UserStack = () => {
       <Stack.Screen
         name="Support"
         component={Support}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="RewardedAds"
-        component={RewardedAds}
         options={{ headerShown: false }}
       />
       <Stack.Screen

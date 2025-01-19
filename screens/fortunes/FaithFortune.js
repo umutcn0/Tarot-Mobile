@@ -1,27 +1,31 @@
-import { StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native';
 import React, { useState } from 'react';
-import { LinearGradient } from 'expo-linear-gradient';
+import {
+  StyleSheet,
+  Text,
+  View,
+  TextInput,
+  TouchableOpacity,
+  ScrollView,
+  SafeAreaView,
+} from 'react-native';
+import useAlert from '../../hooks/useAlert';
 import BottomNavigation from '../../components/BottomNavigation';
-
+import ScreenWrapper from '../../components/ScreenWrapper';
 
 const FaithFortune = ({navigation}) => {
   const [intent, setIntent] = useState('');
+  const alert = useAlert();
 
   const handleContinue = () => {
     if (intent.length > 10) {
       navigation.navigate('CardSelection', { userIntent: intent });
     } else {
-      Alert.alert('Lütfen en az 10 karakter giriniz');
+      alert('Hata', 'Lütfen en az 10 karakter giriniz');
     }
   };
 
   return (
-    <LinearGradient
-      colors={['#1e1b4b', '#4a044e', '#3b0764']}
-      style={styles.container}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
-    >
+    <ScreenWrapper navigation={navigation} pageName="FaithFortune">
       <View style={styles.innerContainer}>
         <Text style={styles.title}>Lütfen niyetinizi giriniz</Text>
         <TextInput
@@ -38,8 +42,7 @@ const FaithFortune = ({navigation}) => {
           <Text style={styles.buttonText}>Devam Et</Text>
         </TouchableOpacity>
       </View>
-      <BottomNavigation navigation={navigation} pageName="IntentInput" />
-    </LinearGradient>
+    </ScreenWrapper>
   );
 }
 

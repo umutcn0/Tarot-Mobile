@@ -19,7 +19,6 @@ export const getUserAsync = createAsyncThunk(
     const q = query(userCollection, where("id", "==", uid));
     const querySnapshot = await getDocs(q);
     const user = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))[0];
-    console.log("getUserAsync", user);
     return user;
   }
 );
@@ -37,10 +36,9 @@ export const userAddAsync = createAsyncThunk(
     "user/userAdd",
     async (user, { rejectWithValue }) => {
         try {
-            const docRef = doc(userCollection, user.id);
+            const docRef = doc(userCollection, user.uid);
             await setDoc(docRef, user);
-            console.log("User successfully added with ID:", user.id);
-            return { id: user.id, ...user };
+            return { id: user.uid, ...user };
         } catch (error) {
             console.error("Error adding user:", error);
             return rejectWithValue(error.message);

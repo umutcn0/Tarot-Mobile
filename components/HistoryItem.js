@@ -3,6 +3,7 @@ import React from 'react'
 
 
 const HistoryItem = ({ historyItem, onPress, isCompleted }) => {
+  console.log(historyItem.id)
   const WrappedView = isCompleted ? TouchableOpacity : View;
   
   const getStatusColor = (status) => {
@@ -53,14 +54,6 @@ const styles = StyleSheet.create({
     marginVertical: 8,
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.1)',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
   },
   entryHeader: {
     gap: 8,

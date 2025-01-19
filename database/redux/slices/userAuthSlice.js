@@ -35,6 +35,7 @@ export const signInAsync = createAsyncThunk(
       await AsyncStorage.setItem("user", JSON.stringify(userData));
       return userData;
     } catch (error) {
+      console.log(error);
       return rejectWithValue(error.message);
     }
   },
@@ -105,6 +106,7 @@ export const getUserToken = createAsyncThunk(
   },
 );
 
+
 const initialState = {
   user: userModel,
   uid: null,
@@ -112,6 +114,7 @@ const initialState = {
   isAuth: false,
   isLoading: false,
   isLoggedIn: false,
+  emailVerified: false,
   error: null,
 };
 
@@ -121,6 +124,11 @@ export const userAuthSlice = createSlice({
   reducers: {
     resetError: (state) => {
       state.error = null;
+    },
+    updateUser: (state, action) => {
+      state.user.emailVerified = action.payload.emailVerified;
+      state.emailVerified = action.payload.emailVerified;
+      AsyncStorage.setItem("user", JSON.stringify(state.user));
     },
   },
   extraReducers: (builder) => {
@@ -133,6 +141,7 @@ export const userAuthSlice = createSlice({
         state.user = action.payload;
         state.uid = action.payload.uid;
         state.token = action.payload.authToken;
+        state.emailVerified = action.payload.emailVerified;
         state.isAuth = true;
         state.isLoggedIn = true;
         state.isLoading = false;
@@ -164,6 +173,7 @@ export const userAuthSlice = createSlice({
         state.user = action.payload;
         state.token = action.payload.authToken;
         state.uid = action.payload.uid;
+        state.emailVerified = action.payload.emailVerified;
         state.isAuth = true;
         state.isLoggedIn = true;
         state.isLoading = false;
@@ -177,6 +187,7 @@ export const userAuthSlice = createSlice({
         state.token = action.payload.authToken;
         state.uid = action.payload.uid;
         state.email = action.payload.email;
+        state.emailVerified = action.payload.emailVerified;
         state.isAuth = true;
         state.isLoading = false;
         state.isLoggedIn = true;
@@ -189,6 +200,6 @@ export const userAuthSlice = createSlice({
   },
 });
 
-export const { resetError } = userAuthSlice.actions;
+export const { resetError, updateUser } = userAuthSlice.actions;
 
 export default userAuthSlice.reducer;

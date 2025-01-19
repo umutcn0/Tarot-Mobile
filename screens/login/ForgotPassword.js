@@ -14,30 +14,33 @@ import LoginTextInput from '../../components/LoginTextInput';
 import LoginButton from '../../components/LoginButton';
 import Loading from '../common/Loading';
 import { sendPasswordResetEmail, getAuth, fetchSignInMethodsForEmail } from 'firebase/auth';
-import { Alert } from 'react-native';
+import useAlert from '../../hooks/useAlert';
+import ScreenWrapper from '../../components/ScreenWrapper';
+const APP_NAME = process.env.EXPO_PUBLIC_APP_NAME;
 
 const auth = getAuth();
 
 const ForgotPassword = ({navigation}) => {
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const alert = useAlert();
 
   const handleResetPassword = async () => {
     if (!email) {
-      Alert.alert('Error', 'Please enter your email address.');
+      alert('Hata', 'Lütfen email adresinizi girin.');
       return;
     }
 
     try {
       setIsLoading(true);
       await sendPasswordResetEmail(auth, email)
-      .then( () => {
-        Alert.alert('Success', 'Password reset email sent. Please check your inbox.');
+      .then(() => {
+        alert('Başarılı', 'Şifre sıfırlama emaili gönderildi. Lütfen emailinizi kontrol edin.');
         navigation.navigate('Login');
       })
-      .catch( (error) => {
-        Alert.alert('Error', 'Please check your email address and try again.');
-        console.error('Password reset error:', error);
+      .catch((error) => {
+        alert('Hata', 'Lütfen email adresinizi kontrol edip tekrar deneyin.');
+        console.error('Şifre sıfırlama hatası:', error);
       });
     } finally {
       setIsLoading(false);
@@ -46,12 +49,7 @@ const ForgotPassword = ({navigation}) => {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <LinearGradient
-        colors={['#1e1b4b', '#4a044e', '#3b0764']}
-        style={styles.container}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-      >
+      <ScreenWrapper navigation={navigation} pageName="ForgotPassword">
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           style={styles.keyboardAvoid}
@@ -59,11 +57,11 @@ const ForgotPassword = ({navigation}) => {
           {isLoading && <Loading/>}
           <View style={styles.formContainer}>
             <View style={styles.formContent}>
-              <Text style={styles.title}>Crystal Vision</Text>
-              <Text style={styles.subtitle}>Restore Your Connection</Text>
+              <Text style={styles.title}>{APP_NAME}</Text>
+              <Text style={styles.subtitle}>Şifreni sıfırla</Text>
 
               <LoginTextInput 
-                inputText="Ethereal Email" 
+                inputText="Email" 
                 onChangeText={setEmail} 
                 keyboardType="email-address" 
                 value={email} 
@@ -74,20 +72,20 @@ const ForgotPassword = ({navigation}) => {
               <LoginButton 
                 onPress={handleResetPassword} 
                 disabled={isLoading} 
-                buttonText="Recover Access" 
+                buttonText="Şifreni sıfırla" 
               />
 
               <View style={styles.linksContainer}>
                 <TouchableOpacity
                   onPress={() => navigation.navigate('Login')}
                 >
-                  <Text style={styles.link}>Return to Portal</Text>
+                  <Text style={styles.link}>Giriş</Text>
                 </TouchableOpacity>
               </View>
             </View>
           </View>
         </KeyboardAvoidingView>
-      </LinearGradient>
+      </ScreenWrapper>
     </TouchableWithoutFeedback>
   )
 }

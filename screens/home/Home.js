@@ -1,26 +1,26 @@
+import React, { useEffect } from 'react'
 import { StyleSheet, Text, View, ScrollView, SafeAreaView } from 'react-native'
-import React from 'react'
-import { LinearGradient } from 'expo-linear-gradient';
 import FortuneCard from '../../components/FortuneCard';
 import BottomNavigation from '../../components/BottomNavigation';
 import TopProfileBar from '../common/TopProfileBar';
+import { useSelector } from 'react-redux';
+import ScreenWrapper from '../../components/ScreenWrapper';
+import { LinearGradient } from 'expo-linear-gradient'
 
 
 const Home = ({ navigation }) => {
+  const emailVerified = useSelector((state) => state.userAuth.emailVerified);
+
+  useEffect(() => {
+    if (!emailVerified) {
+      navigation.replace('VerifyEmail');
+    }
+  }, [emailVerified]);
+
   return (
-    <LinearGradient
-      colors={['#1e1b4b', '#4a044e', '#3b0764']}
-      style={styles.container}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
-    >
-      <SafeAreaView style={styles.container}>
+    <ScreenWrapper navigation={navigation} pageName="Home">
       <TopProfileBar navigation={navigation} />
-
-      {/* Welcome Section */}
       <Text style={styles.welcomeText}>Gelecekte seni neler bekliyor ?</Text>
-
-      {/* Fortune Options */}
       <ScrollView style={styles.scrollView}>
         <View style={styles.fortuneGrid}>
           <FortuneCard
@@ -82,13 +82,9 @@ const Home = ({ navigation }) => {
           />
         </View>
       </ScrollView>
-    </SafeAreaView>
-    <BottomNavigation navigation={navigation} pageName="Home"/>
-    </LinearGradient>
+    </ScreenWrapper>
   )
 }
-
-export default Home
 
 const styles = StyleSheet.create({
   container: {
@@ -110,3 +106,5 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   }
 })
+
+export default Home

@@ -7,11 +7,15 @@ import { getFortune } from '../../services/fortuneServices'
 import Loading from '../common/Loading'
 import { useSelector } from 'react-redux'
 import { cardImages } from '../../media/imageList'
-
+import ScreenWrapper from '../../components/ScreenWrapper';
 
 const CardReview = ({ card }) => {
-  const cardName = card.image_name.toLowerCase()
-  const cardImage = cardImages.find(image => image.name === cardName).image;
+  const cardImageName = card.image_name.includes('.') ? card.image_name.split('.')[0].toLowerCase() : card.image_name.toLowerCase()
+  const cardImage = cardImages.find(image => image.name.includes(cardImageName)).image;
+  const cardName = card.name
+    .split('_')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
   
   return (
     <View style={styles.cardContainer}>
@@ -20,7 +24,7 @@ const CardReview = ({ card }) => {
         style={styles.cardImage}
         resizeMode="contain"
       />
-      <Text style={styles.cardName}>{card.name}</Text>
+      <Text style={styles.cardName}>{cardName}</Text>
       <View style={styles.meaningContainer}>
         <Text style={styles.sectionTitle}>Anlamı</Text>
         <Text style={styles.meaningText}>{card.meaning}</Text>
@@ -43,20 +47,14 @@ const FortuneDetail = ({ navigation, route }) => {
   useEffect(() => {
     const fetchFortune = async () => {
       var fortune = await getFortune(user.uid, fortuneId);
-      fortune = fortune[0].result
-      setFortune(fortune);
+      setFortune(fortune.result);
       setLoading(false);
     };
     fetchFortune();
   }, []);
 
   return (
-    <LinearGradient
-      colors={['#1e1b4b', '#4a044e', '#3b0764']}
-      style={styles.container}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
-    >
+    <ScreenWrapper navigation={navigation} pageName="FortuneDetail">
       <SafeAreaView style={styles.container}>
         <TopProfileBar navigation={navigation} />
         {loading ? <Loading /> : 
@@ -74,8 +72,7 @@ const FortuneDetail = ({ navigation, route }) => {
         </ScrollView>
         }
       </SafeAreaView>
-      <BottomNavigation navigation={navigation} pageName="FortuneDetail"/>
-    </LinearGradient>
+    </ScreenWrapper>
   )
 }
 

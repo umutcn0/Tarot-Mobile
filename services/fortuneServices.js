@@ -5,6 +5,8 @@ import {
   query,
   where,
   orderBy,
+  doc,
+  getDoc,
 } from "firebase/firestore";
 import { useSelector } from "react-redux";
 
@@ -17,10 +19,13 @@ const fortuneCollection = collection(db, "fortune_history");
  * @returns {Promise<Object>} The fetched fortune
  */
 export const getFortune = async (userId, fortuneId) => {
-  const q = query(fortuneCollection, [where("user_id", "==", userId), where("id", "==", fortuneId)]);
-  const querySnapshot = await getDocs(q);
-  const fortune = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-  return fortune;
+  const docRef = doc(db, "fortune_history", fortuneId);
+  const docSnap = await getDoc(docRef);
+  
+  if (docSnap.exists()) {
+    return { id: docSnap.id, ...docSnap.data() };
+  }
+  return null;
 };
 
 /**

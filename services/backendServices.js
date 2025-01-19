@@ -44,7 +44,7 @@ export const sendFortune = async (items, userId) => {
       console.log(SERVER_URL)
 
       const response = await fetch(
-        `${SERVER_URL}/api/chat-test`,
+        `${SERVER_URL}/api/chat`,
         {
           method: "POST",
           headers: {

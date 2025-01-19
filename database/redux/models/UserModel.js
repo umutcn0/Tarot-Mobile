@@ -18,6 +18,6 @@ export const userModel = {
     maritalStatus: null,
     jobStatus: null,
     education: null,
-    language: "Turkish",
+    language: "Türkçe",
     currency: "TRY",
 }

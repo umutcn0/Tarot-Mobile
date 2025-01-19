@@ -5,11 +5,13 @@ import BottomNavigation from '../../components/BottomNavigation';
 import { cardImages, defaultCardsImages } from '../../media/imageList';
 import Loading from '../common/Loading';
 import TopProfileBar from '../common/TopProfileBar';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { sendFortune } from '../../services/backendServices';
 import { getUserToken, updateUserToken } from '../../services/tokenServices';
-
+import { useAlert } from '../../hooks/useAlert';
+import ScreenWrapper from '../../components/ScreenWrapper';
 const CardSelection = ({ navigation, route }) => {
+  const alert = useAlert();
   const { selectCardAmount = 3, category_title, category_description } = route.params;
   const [cards, setCards] = useState([]);
   const [defaultCards, setDefaultCards] = useState([]);
@@ -19,13 +21,13 @@ const CardSelection = ({ navigation, route }) => {
   const [isSending, setIsSending] = useState(false);
   const [coinAmount, setCoinAmount] = useState(0);
   const user = useSelector((state) => state.userAuth.user);
-
+  
   useEffect(() => {
 
     const check_coin_amount = async () => {
       const coin_amount = await getUserToken(user.uid);
       if (coin_amount < 3) {
-        alert("Yeterli jetonunuz bulunmamaktadır.");
+        alert('Hata', 'Yeterli jetonunuz bulunmamaktadır.');
         navigation.navigate('Home');
       }
 
@@ -95,7 +97,6 @@ const CardSelection = ({ navigation, route }) => {
       }
   
     } catch (error) {
-      console.error('Fortune sending error:', error);
       alert('Fal gönderilirken bir hata oluştu');
     } finally {
       setIsSending(false);
@@ -103,12 +104,7 @@ const CardSelection = ({ navigation, route }) => {
   };
 
   return (
-    <LinearGradient
-      colors={['#1e1b4b', '#4a044e', '#3b0764']}
-      style={styles.container}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
-    >
+    <ScreenWrapper navigation={navigation} pageName="CardSelection">
       <SafeAreaView style={styles.container}>
         { isLoading && <Loading/> }
         <TopProfileBar navigation={navigation} />
@@ -136,8 +132,7 @@ const CardSelection = ({ navigation, route }) => {
           </Text>
         </TouchableOpacity>
       </SafeAreaView>
-      <BottomNavigation navigation={navigation} pageName="CardSelection"/>
-    </LinearGradient>
+    </ScreenWrapper>
   )
 }
 

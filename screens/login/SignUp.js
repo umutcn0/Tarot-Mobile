@@ -13,8 +13,11 @@ import { useState } from 'react';
 import LoginTextInput from '../../components/LoginTextInput';
 import LoginButton from '../../components/LoginButton';
 import Loading from '../common/Loading';
-import { LinearGradient } from 'expo-linear-gradient';
 import CryptoJS from 'crypto-js';
+import useAlert from '../../hooks/useAlert';
+import ScreenWrapper from '../../components/ScreenWrapper';
+
+const APP_NAME = process.env.EXPO_PUBLIC_APP_NAME;
 
 const SignUp = ({navigation}) => {
   const [name, setName] = useState('');
@@ -24,32 +27,49 @@ const SignUp = ({navigation}) => {
   const { isLoading, error } = useSelector((state) => state.userAuth);
 
   const dispatch = useDispatch();
+  const alert = useAlert();
 
   const handleSignUp = async () => {
     try {
+      if (password !== confirmPassword) {
+        alert('Hata', 'Şifreler eşleşmiyor.');
+        return;
+      } else if (password.length < 8) {
+        alert('Hata', 'Şifre en az 8 karakter olmalıdır.');
+        return;
+      } else if (name.length < 3) {
+        alert('Hata', 'İsim en az 3 karakter olmalıdır.');
+        return;
+      } else if (email.length < 3) {
+        alert('Hata', 'Email en az 3 karakter olmalıdır.');
+        return;
+      } else if (!email.includes('@')) {
+        alert('Hata', 'Email geçerli bir email adresi olmalıdır.');
+        return;
+      } else if (password.includes(' ')) {
+        alert('Hata', 'Şifre boşluk içeremez.');
+        return;
+      }
+
       const signUpResponse = await dispatch(signUpAsync({ name, email, password })).unwrap();
       const hashedPassword = CryptoJS.SHA256(password).toString();
 
       const userData = {
         ...signUpResponse,
-        password: hashedPassword
+        password: hashedPassword,
+        id: signUpResponse.uid
       }
 
       await dispatch(userAddAsync(userData));
     } catch (error) {
-      Alert.alert('Error', 'Please check your email address and try again.');
-      console.log(error);
+      console.error('Signup error:', error);
+      alert('Hata', 'Lütfen email adresinizi kontrol edip tekrar deneyin.');
     }
-}
+  };
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <LinearGradient
-        colors={['#1e1b4b', '#4a044e', '#3b0764']}
-        style={styles.container}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        >
+        <ScreenWrapper navigation={navigation} pageName="SignUp">
             <KeyboardAvoidingView
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 style={styles.keyboardAvoid}
@@ -58,32 +78,32 @@ const SignUp = ({navigation}) => {
                 {/* Main content */}
                 <View style={styles.formContainer}>
                     <View style={styles.formContent}>
-                        <Text style={styles.title}>Crystal Vision</Text>
-                        <Text style={styles.subtitle}>Create your account</Text>
+                        <Text style={styles.title}>{APP_NAME}</Text>
+                        <Text style={styles.subtitle}>Hesap oluştur</Text>
 
                         {/* Name input */}
-                        <LoginTextInput inputText="Your Name" onChangeText={setName} keyboardType="default" value={name} placeholder="John Doe" inputIcon="mail" />
+                        <LoginTextInput inputText="İsim" onChangeText={setName} keyboardType="default" value={name} placeholder="John Doe" inputIcon="mail" />
                         {/* Email input */}
-                        <LoginTextInput inputText="Ethereal Email" onChangeText={setEmail} keyboardType="email-address" value={email} placeholder="your.spirit@realm.com" inputIcon="mail" />
+                        <LoginTextInput inputText="Email" onChangeText={setEmail} keyboardType="email-address" value={email} placeholder="your.spirit@realm.com" inputIcon="mail" />
                         {/* Password input */}
-                        <LoginTextInput inputText="Mystic Password" onChangeText={setPassword} keyboardType="default" value={password} placeholder="••••••••" inputIcon="key" secureTextEntry={true} />
+                        <LoginTextInput inputText="Şifre" onChangeText={setPassword} keyboardType="default" value={password} placeholder="••••••••" inputIcon="key" secureTextEntry={true} />
                         {/* Confirm Password input */}
-                        <LoginTextInput inputText="Confirm Password" onChangeText={setConfirmPassword} keyboardType="default" value={confirmPassword} placeholder="••••••••" inputIcon="key" secureTextEntry={true} />
+                        <LoginTextInput inputText="Şifreni Doğrula" onChangeText={setConfirmPassword} keyboardType="default" value={confirmPassword} placeholder="••••••••" inputIcon="key" secureTextEntry={true} />
                         {/* Login button */}
-                        <LoginButton onPress={handleSignUp} disabled={isLoading} buttonText="Create Account" />
+                        <LoginButton onPress={handleSignUp} disabled={isLoading} buttonText="Hesap Oluştur" />
 
                         {/* Additional links */}
                         <View style={styles.linksContainer}>
                         <TouchableOpacity
                             onPress={() => navigation.navigate('Login')}
                         >
-                            <Text style={styles.link}>Already have an account?</Text>
+                            <Text style={styles.link}>Zaten hesabın var mı?</Text>
                         </TouchableOpacity>
                     </View>
                     </View>
                 </View>
             </KeyboardAvoidingView>
-        </LinearGradient>
+        </ScreenWrapper>
     </TouchableWithoutFeedback>
   );
 };
