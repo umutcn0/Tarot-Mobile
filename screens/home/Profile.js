@@ -1,29 +1,28 @@
 import { StyleSheet, Text, View, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import { LinearGradient } from 'expo-linear-gradient'
 import { Ionicons } from '@expo/vector-icons'
 import { signOutAsync } from '../../database/redux/slices/userAuthSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import Loading from '../common/Loading';
-import BottomNavigation from '../../components/BottomNavigation';
 import { getUserAsync } from '../../database/redux/slices/userSlice';
 import ScreenWrapper from '../../components/ScreenWrapper';
+
+
 const Profile = ({navigation}) => {
-  const user = useSelector((state) => state.userAuth.user);
-  const isLoading = useSelector((state) => state.userAuth.isLoading);
+  const user = useSelector((state) => state.user.user);
+  const isLoading = useSelector((state) => state.user.isLoading);
+  const userUid = useSelector((state) => state.userAuth.user.uid);
   const dispatch = useDispatch();
-  const [userDetails, setUserDetails] = useState(null);
-  const [isLoadingDetails, setIsLoadingDetails] = useState(true);
 
   useEffect(() => {
-    fetchUserDetails();
-  }, []);
+    const fetchUserDetails = async () => {
+      const response = await dispatch(getUserAsync(userUid));
+    }
 
-  const fetchUserDetails = async () => {
-    const response = await dispatch(getUserAsync(user.uid));
-    setUserDetails(response.payload);
-    setIsLoadingDetails(false);
-  }
+    if (user === null) {
+      fetchUserDetails();
+    }
+  }, []);
 
   const handleLogout = () => {
     try {
@@ -36,7 +35,7 @@ const Profile = ({navigation}) => {
 
   return (
     <ScreenWrapper navigation={navigation} pageName="Profile">
-      {(isLoading || isLoadingDetails) && <Loading/>}
+      {isLoading && <Loading/>}
       <SafeAreaView style={styles.container}>
         <ScrollView style={styles.scrollView}>
           {/* Profile Header */}
@@ -44,8 +43,8 @@ const Profile = ({navigation}) => {
             <TouchableOpacity style={styles.avatarContainer}>
               <Ionicons name="planet" size={80} color="#fff" />
             </TouchableOpacity>
-            <Text style={styles.name}>{userDetails?.displayName || "Unknown"}</Text>
-            <Text style={styles.email}>{userDetails?.email || "Unknown"}</Text>
+            <Text style={styles.name}>{user?.displayName || "Unknown"}</Text>
+            <Text style={styles.email}>{user?.email || "Unknown"}</Text>
           </View>
 
           {/* Profile Options */}

@@ -1,6 +1,6 @@
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { Home, History, Profile, Token } from "../screens/home";
+import TabNavigator from "../components/TabNavigator";
 import { CardSelection, FaithFortune, FortuneDetail } from "../screens/fortunes";
 import { AppSettings, ProfileSettings, Support } from "../screens/settings";
 import { VerifyEmail } from "../screens/login";
@@ -12,30 +12,15 @@ const UserStack = () => {
   const emailVerified = useSelector((state) => state.userAuth.emailVerified);
 
   return (
-    <Stack.Navigator initialRouteName={emailVerified ? "Home" : "VerifyEmail"}>
+    <Stack.Navigator initialRouteName={emailVerified ? "MainTabs" : "VerifyEmail"}>
       <Stack.Screen
         name="VerifyEmail"
         component={VerifyEmail}
         options={{ headerShown: false }}
       />
       <Stack.Screen
-        name="Home"
-        component={Home}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="History"
-        component={History}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="Profile"
-        component={Profile}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="Token"
-        component={Token}
+        name="MainTabs"
+        component={TabNavigator}
         options={{ headerShown: false }}
       />
       <Stack.Screen

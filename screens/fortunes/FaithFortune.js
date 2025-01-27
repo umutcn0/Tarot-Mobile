@@ -5,11 +5,8 @@ import {
   View,
   TextInput,
   TouchableOpacity,
-  ScrollView,
-  SafeAreaView,
 } from 'react-native';
 import useAlert from '../../hooks/useAlert';
-import BottomNavigation from '../../components/BottomNavigation';
 import ScreenWrapper from '../../components/ScreenWrapper';
 
 const FaithFortune = ({navigation}) => {

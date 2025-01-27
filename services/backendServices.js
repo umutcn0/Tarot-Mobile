@@ -1,8 +1,6 @@
 import {getAuth} from 'firebase/auth'
 
-const SERVER_URL = __DEV__ 
-  ? process.env.EXPO_PUBLIC_API_SERVER_DEV_URL || 'http://localhost:8000'  // fallback dev URL
-  : process.env.EXPO_PUBLIC_API_SERVER_URL || 'https://api.yourproduction.com';  // fallback prod URL
+const SERVER_URL = process.env.EXPO_PUBLIC_API_SERVER_URL 
 
 if (!SERVER_URL) {
   console.error('SERVER_URL is not properly configured. Check your environment variables.');
@@ -25,7 +23,7 @@ export const getAuthToken = async () => {
  * @param {string} userId - The user ID
  * @returns {Promise<Object>} The response from the backend
  */
-export const sendFortune = async (items, userId) => {
+export const sendFortune = async (items, userId, userInfo) => {
     try {
       const token = await getAuthToken();
 
@@ -55,9 +53,14 @@ export const sendFortune = async (items, userId) => {
           body: JSON.stringify(request_body),
         }
       );
-      return true;
+
+      if (response.ok) {
+        return true;
+      }
+      return false;
+
     } catch (error) {
-      console.error('Fortune sending error:', error);
-      throw error;
+      console.error('Error sending fortune:', error);
+      return false;
     }
 };

@@ -69,7 +69,8 @@
             "3qcr597p9d.skadnetwork"
           ]
         }
-      ]
+      ],
+      "expo-localization"
     ],
     "extra": {
       "eas": {

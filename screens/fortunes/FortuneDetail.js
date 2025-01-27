@@ -1,8 +1,6 @@
 import { StyleSheet, Text, View, ScrollView, SafeAreaView, Image } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import { LinearGradient } from 'expo-linear-gradient'
 import TopProfileBar from '../common/TopProfileBar'
-import BottomNavigation from '../../components/BottomNavigation'
 import { getFortune } from '../../services/fortuneServices'
 import Loading from '../common/Loading'
 import { useSelector } from 'react-redux'

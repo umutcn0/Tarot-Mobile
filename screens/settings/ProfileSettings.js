@@ -7,16 +7,16 @@ import {
   SafeAreaView,
 } from "react-native";
 import React, { useState, useEffect } from "react";
-import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import { useDispatch, useSelector } from "react-redux";
 import Loading from "../common/Loading";
-import BottomNavigation from "../../components/BottomNavigation";
 import { getUserAsync, userUpdateAsync } from "../../database/redux/slices/userSlice";
 import * as Clipboard from 'expo-clipboard';
 import EditModal from '../../components/EditModal';
 import useAlert from '../../hooks/useAlert';
 import ScreenWrapper from "../../components/ScreenWrapper";
+import { profileSettingsFields } from "../../constants/ComponentConfigs";
+
 
 const SettingsTouchableOpacity = ({user, openModal, field_name, field_title}) => {
   if (!user) return null;
@@ -32,9 +32,9 @@ const SettingsTouchableOpacity = ({user, openModal, field_name, field_title}) =>
 }
 
 const ProfileSettings = ({ navigation }) => {
-  const user = useSelector((state) => state.userAuth.user);
-  const [isLoading, setIsLoading] = useState(true);
-  const [userDetails, setUserDetails] = useState(null);
+  const user = useSelector((state) => state.user.user);
+  const userUid = useSelector((state) => state.userAuth.user.uid);
+  const isLoading = useSelector((state) => state.user.isLoading);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [activeField, setActiveField] = useState(null);
   const [editValue, setEditValue] = useState('');
@@ -43,18 +43,17 @@ const ProfileSettings = ({ navigation }) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    fetchUserDetails();
+    const fetchUserDetails = async () => {
+      await dispatch(getUserAsync(userUid));
+    }
+
+    if (user === null) {
+      fetchUserDetails();
+    }
   }, []);
 
-  const fetchUserDetails = async () => {
-    const response = await dispatch(getUserAsync(user.uid));
-    setUserDetails(response.payload);
-    setIsLoading(false);
-  }
-
-  const updateUserDetails = async (field, value) => {
-    const response = await dispatch(userUpdateAsync({...userDetails, [field]: value }));
-    fetchUserDetails();
+  const updateUser = async (field, value) => {
+    await dispatch(userUpdateAsync({...user, [field]: value }));
     setIsModalVisible(false);
   }
 
@@ -62,32 +61,6 @@ const ProfileSettings = ({ navigation }) => {
     setActiveField(field);
     setEditValue(currentValue || '');
     setIsModalVisible(true);
-  };
-
-  const fieldConfigs = {
-    displayName: {
-      title: 'İsmi Güncelle',
-      type: 'text',
-    },
-    age: {
-      title: 'Yaşı Güncelle',
-      type: 'number',
-    },
-    maritalStatus: {
-      title: 'Medeni Durumunu Güncelle',
-      type: 'select',
-      options: ['Single', 'In a Relationship', 'Married', 'Divorced', 'Widowed'],
-    },
-    jobStatus: {
-      title: 'İş Durumunu Güncelle',
-      type: 'select',
-      options: ['Employed', 'Unemployed', 'Student', 'Retired'],
-    },
-    education: {
-      title: 'Eğitim Durumunu Güncelle',
-      type: 'select',
-      options: ['High School', 'Bachelor', 'Master', 'PhD', 'Other'],
-    },
   };
 
   const copyToClipboard = async (text) => {
@@ -115,21 +88,21 @@ const ProfileSettings = ({ navigation }) => {
           {/* Profile Header */}
           <View style={styles.header}>
             <Text style={styles.name}>
-              {userDetails?.displayName || "Unknown"}
+              {user?.displayName || "Unknown"}
             </Text>
             <Text style={styles.email}>
-              {userDetails?.email || "Unknown"}
+              {user?.email || "Unknown"}
             </Text>
           </View>
 
-          {/* Profile Sections - Only render when userDetails is available */}
-          {userDetails && (
+          {/* Profile Sections - Only render when user is available */}
+          {user && (
             <View style={styles.formContent}>
-              <SettingsTouchableOpacity user={userDetails} openModal={openModal} field_name="displayName" field_title="İsim" />
-              <SettingsTouchableOpacity user={userDetails} openModal={openModal} field_name="age" field_title="Yaş" />
-              <SettingsTouchableOpacity user={userDetails} openModal={openModal} field_name="maritalStatus" field_title="Medeni Durum" />
-              <SettingsTouchableOpacity user={userDetails} openModal={openModal} field_name="jobStatus" field_title="İş Durum" />
-              <SettingsTouchableOpacity user={userDetails} openModal={openModal} field_name="education" field_title="Eğitim Durum" />
+              <SettingsTouchableOpacity user={user} openModal={openModal} field_name="displayName" field_title="İsim" />
+              <SettingsTouchableOpacity user={user} openModal={openModal} field_name="age" field_title="Yaş" />
+              <SettingsTouchableOpacity user={user} openModal={openModal} field_name="maritalStatus" field_title="Medeni Durum" />
+              <SettingsTouchableOpacity user={user} openModal={openModal} field_name="jobStatus" field_title="İş Durum" />
+              <SettingsTouchableOpacity user={user} openModal={openModal} field_name="education" field_title="Eğitim Durum" />
               
               {/* Update Password Section 
               <TouchableOpacity
@@ -145,8 +118,8 @@ const ProfileSettings = ({ navigation }) => {
               </TouchableOpacity>
               */}
               {/* Referral Code Section */}
-              <TouchableOpacity style={styles.option} onPress={() => copyToClipboard(userDetails.referralCode)}>
-                <Text style={styles.optionText}>Referans Kodu: {userDetails.referralCode}</Text>
+              <TouchableOpacity style={styles.option} onPress={() => copyToClipboard(user.referralCode)}>
+                <Text style={styles.optionText}>Referans Kodu: {user.referralCode}</Text>
                 <Ionicons name="copy-outline" size={24} color="rgba(255, 255, 255, 0.5)" />
               </TouchableOpacity>
             </View>
@@ -157,10 +130,10 @@ const ProfileSettings = ({ navigation }) => {
           isVisible={isModalVisible}
           onRequestClose={() => setIsModalVisible(false)}
           activeField={activeField}
-          fieldConfigs={fieldConfigs}
+          fieldConfigs={profileSettingsFields}
           editValue={editValue}
           setEditValue={setEditValue}
-          onUpdate={updateUserDetails}
+          onUpdate={updateUser}
         />
       </SafeAreaView>
     </ScreenWrapper>

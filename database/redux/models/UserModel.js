@@ -1,3 +1,5 @@
+import { DEFAULT_COIN_AMOUNT, DEFAULT_LANGUAGE, DEFAULT_CURRENCY } from "../../../constants/config";
+
 export const userModel = {
     id: null,
     email: null,
@@ -13,11 +15,11 @@ export const userModel = {
     lastLogin: '',
     createdAt: '',
     updatedAt: '',
-    coinAmount: 3,
+    coinAmount: DEFAULT_COIN_AMOUNT,
     age: null,
     maritalStatus: null,
     jobStatus: null,
     education: null,
-    language: "Türkçe",
-    currency: "TRY",
+    language: DEFAULT_LANGUAGE,
+    currency: DEFAULT_CURRENCY,
 }

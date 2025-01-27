@@ -1,15 +1,14 @@
 import { StyleSheet, Text, View, TouchableOpacity, FlatList, SafeAreaView, Image } from 'react-native'
 import React, { useState, useEffect } from 'react'
-import { LinearGradient } from 'expo-linear-gradient'
-import BottomNavigation from '../../components/BottomNavigation';
 import { cardImages, defaultCardsImages } from '../../media/imageList';
 import Loading from '../common/Loading';
 import TopProfileBar from '../common/TopProfileBar';
-import { useSelector } from 'react-redux';
 import { sendFortune } from '../../services/backendServices';
-import { getUserToken, updateUserToken } from '../../services/tokenServices';
+import { updateUserCoin } from '../../services/coinServices';
 import { useAlert } from '../../hooks/useAlert';
 import ScreenWrapper from '../../components/ScreenWrapper';
+
+
 const CardSelection = ({ navigation, route }) => {
   const alert = useAlert();
   const { selectCardAmount = 3, category_title, category_description } = route.params;
@@ -19,22 +18,9 @@ const CardSelection = ({ navigation, route }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [numColumns, setNumColumns] = useState(3);
   const [isSending, setIsSending] = useState(false);
-  const [coinAmount, setCoinAmount] = useState(0);
-  const user = useSelector((state) => state.userAuth.user);
+  const coinAmount = useSelector((state) => state.coin.coinAmount);
   
   useEffect(() => {
-
-    const check_coin_amount = async () => {
-      const coin_amount = await getUserToken(user.uid);
-      if (coin_amount < 3) {
-        alert('Hata', 'Yeterli jetonunuz bulunmamaktadır.');
-        navigation.navigate('Home');
-      }
-
-      setCoinAmount(coin_amount);
-    }
-    check_coin_amount();
-
     const shuffleArray = (array) => {
       for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -84,18 +70,24 @@ const CardSelection = ({ navigation, route }) => {
         return;
       }
 
-      const result = await sendFortune({
+      const userInfo = await dispatch(getUserAsync(user.uid));
+      const request_status = await sendFortune({
         selectedCards: selectedCards,
         category_title: category_title,
         category_description: category_description,
-      }, user.uid);
-  
-      if (result) {
-        await updateUserToken(user.uid, -3);
+        }, 
+        user.uid,
+        userInfo
+      );
+
+      if (request_status) {
+        await updateUserCoin(user.uid, -3);
         alert("Falınız başarıyla gönderildi.");
-        navigation.navigate('Home');
+        navigation.navigate('MainTabs', { screen: 'Home' });
+      } else {
+        alert("Fal gönderilirken bir hata oluştu");
       }
-  
+
     } catch (error) {
       alert('Fal gönderilirken bir hata oluştu');
     } finally {

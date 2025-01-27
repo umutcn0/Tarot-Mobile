@@ -1,11 +1,10 @@
 import { StyleSheet, View, Platform, SafeAreaView } from 'react-native'
-import React, { useEffect } from 'react'
+import React from 'react'
 import { LinearGradient } from 'expo-linear-gradient';
-import BottomNavigation from './BottomNavigation';
 import { StatusBar } from 'expo-status-bar';
 import Constants from 'expo-constants';
 
-const ScreenWrapper = ({ children, navigation, pageName }) => {
+const ScreenWrapper = ({ children }) => {
   return (
     <LinearGradient
       colors={['#1e1b4b', '#4a044e', '#3b0764']}
@@ -13,12 +12,11 @@ const ScreenWrapper = ({ children, navigation, pageName }) => {
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
     >
-      <SafeAreaView style={styles.safeArea}>
+      <SafeAreaView style={styles.safeArea} edges={['top']}>
         <View style={styles.contentContainer}>
           {children}
         </View>
       </SafeAreaView>
-      <BottomNavigation navigation={navigation} pageName={pageName}/>
       <StatusBar style="light" />
     </LinearGradient>
   )

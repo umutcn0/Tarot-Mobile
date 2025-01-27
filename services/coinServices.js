@@ -1,5 +1,7 @@
 import { collection, query, where, getDocs, doc, updateDoc } from 'firebase/firestore';
-import { db } from '../database/firebase/firebaseConfig'; // Assuming you have your Firebase config file
+import { db } from '../database/firebase/firebaseConfig';
+import { setCoinAmount } from '../database/redux/slices/coinSlice';
+import { useDispatch } from 'react-redux';
 
 // Collection reference
 const userCollection = collection(db, 'users');
@@ -9,7 +11,7 @@ const userCollection = collection(db, 'users');
  * @param {string} userId - The user's ID
  * @returns {Promise<number>} The user's coin amount
  */
-export const getUserToken = async (userId) => {
+export const getUserCoin = async (userId) => {
   try { 
     const q = query(userCollection, where("id", "==", userId));
     const querySnapshot = await getDocs(q);
@@ -24,15 +26,19 @@ export const getUserToken = async (userId) => {
 /**
  * Updates the user's token/coin amount in Firestore
  * @param {string} userId - The user's ID
- * @param {number} rewardedCoinAmount - Amount of coins to add
+ * @param {number} coinAmount - Amount of coins to add
  * @returns {Promise<Object>} Updated user data
  */
-export const updateUserToken = async (userId, rewardedCoinAmount) => {
+export const updateUserCoin = async (userId, coinAmount) => {
   const docRef = doc(userCollection, userId);
-  const currentCoinAmount = await getUserToken(userId);
-  
-  const newCoinAmount = currentCoinAmount + rewardedCoinAmount;
+  const currentCoinAmount = await getUserCoin(userId);
+  const newCoinAmount = currentCoinAmount + coinAmount;
   
   await updateDoc(docRef, { coinAmount: newCoinAmount });
+
+  // Update Redux state
+  const dispatch = useDispatch();
+  dispatch(setCoinAmount(newCoinAmount));
+
   return { id: userId, coinAmount: newCoinAmount };
 };

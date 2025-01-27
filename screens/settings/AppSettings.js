@@ -7,14 +7,15 @@ import {
   SafeAreaView,
 } from "react-native";
 import React, { useState, useEffect } from "react";
-import { LinearGradient } from "expo-linear-gradient";
-import BottomNavigation from "../../components/BottomNavigation";
 import { useDispatch, useSelector } from "react-redux";
 import { getUserAsync, userUpdateAsync } from "../../database/redux/slices/userSlice";
 import { Ionicons } from "@expo/vector-icons";
 import EditModal from "../../components/EditModal";
 import Loading from "../common/Loading";
 import ScreenWrapper from "../../components/ScreenWrapper";
+import { appSettingsFields } from "../../constants/ComponentConfigs";
+
+
 const AppSettingsTouchableOpacity = ({user, openModal, field_name, field_title}) => {
   if (!user) return null;
   
@@ -30,40 +31,26 @@ const AppSettingsTouchableOpacity = ({user, openModal, field_name, field_title})
 
 
 const AppSettings = ({ navigation }) => {
-  const dispatch = useDispatch();
-  const user = useSelector((state) => state.userAuth.user);
-  const [isLoading, setIsLoading] = useState(true);
-  const [userDetails, setUserDetails] = useState(null);
+  const user = useSelector((state) => state.user.user);
+  const isLoading = useSelector((state) => state.user.isLoading);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [activeField, setActiveField] = useState(null);
   const [editValue, setEditValue] = useState('');
-
-  const fieldConfigs = {
-    language: {
-      title: 'Dil',
-      type: 'select',
-      options: ['Türkçe'],
-    },
-    currency: {
-      title: 'Para Birimi',
-      type: 'select',
-      options: ['TRY'],
-    },
-  };
+  
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    fetchUserDetails();
+    const fetchUserDetails = async () => {
+      const response = await dispatch(getUserAsync(userUid));
+    }
+
+    if (user === null) {
+      fetchUserDetails();
+    }
   }, []);
 
-  const fetchUserDetails = async () => {
-    const response = await dispatch(getUserAsync(user.uid));
-    setUserDetails(response.payload);
-    setIsLoading(false);
-  };
-
-  const updateUserDetails = async (field, value) => {
-    await dispatch(userUpdateAsync({...userDetails, [field]: value }));
-    fetchUserDetails();
+  const updateUser = async (field, value) => {
+    await dispatch(userUpdateAsync({...user, [field]: value }));
     setIsModalVisible(false);
   }
 
@@ -86,16 +73,16 @@ const AppSettings = ({ navigation }) => {
           <Text style={styles.title}>Genel Ayarlar</Text>
 
           <View style={styles.formContent}>
-            {userDetails && (
+            {user && (
               <>
                 <AppSettingsTouchableOpacity
-                  user={userDetails}
+                  user={user}
                   openModal={openModal}
                   field_name="language"
                   field_title="Dil"
             />
             <AppSettingsTouchableOpacity
-                  user={userDetails}
+                  user={user}
                   openModal={openModal}
                   field_name="currency"
                   field_title="Para Birimi"
@@ -108,10 +95,10 @@ const AppSettings = ({ navigation }) => {
           isVisible={isModalVisible}
           onRequestClose={() => setIsModalVisible(false)}
           activeField={activeField}
-          fieldConfigs={fieldConfigs}
+          fieldConfigs={appSettingsFields}
           editValue={editValue}
           setEditValue={setEditValue}
-          onUpdate={updateUserDetails}
+          onUpdate={updateUser}
         />
       </SafeAreaView>
     </ScreenWrapper>

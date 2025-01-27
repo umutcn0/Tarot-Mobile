@@ -36,7 +36,7 @@ const VerifyEmail = ({navigation}) => {
         await currentUser?.reload();
         if (currentUser?.emailVerified) {
           dispatch(updateUser({ emailVerified: true }));
-          navigation.navigate('Home');
+          navigation.navigate('MainTabs', { screen: 'Home' });
         }
       } catch (error) {
         console.error('Error checking verification status:', error);

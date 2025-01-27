@@ -54,20 +54,20 @@ const BottomNavigation = ({ navigation, pageName }) => {
 
       <TouchableOpacity
         style={styles.navItem}
-        onPress={() => handleNavigation("Token")}
+        onPress={() => handleNavigation("Purchase")}
       >
         <Ionicons
           name="diamond-outline"
           size={24}
-          color={pageName === "Token" ? "#fff" : "#5e646e"}
+          color={pageName === "Purchase" ? "#fff" : "#5e646e"}
         />
         <Text
           style={[
             styles.navText,
-            { color: pageName === "Token" ? "#fff" : "#5e646e" },
+            { color: pageName === "Purchase" ? "#fff" : "#5e646e" },
           ]}
         >
-          Token
+          Purchase 
         </Text>
       </TouchableOpacity>
 

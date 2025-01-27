@@ -1,13 +1,14 @@
 import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
 import React, { useEffect, useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { Ionicons } from '@expo/vector-icons';
-import { useSelector } from 'react-redux';
-import { getUserToken } from '../../services/tokenServices';
-
-const APP_NAME = process.env.EXPO_PUBLIC_APP_NAME;
+import { getUserCoin } from '../../services/coinServices';
+import { APP_NAME } from '../../constants/config';
+import { setCoinAmount } from '../../database/redux/slices/coinSlice';
 
 const TopProfileBar = ({navigation}) => {
-    const [coinAmount, setcoinAmount] = useState(0);
+    const dispatch = useDispatch();
+    const coinAmount = useSelector((state) => state.coin.coinAmount);
     const [loading, setLoading] = useState(true);
     const user = useSelector((state) => state.userAuth.user);
 
@@ -15,15 +16,15 @@ const TopProfileBar = ({navigation}) => {
         const getUserData = async () => {
             try {
                 setLoading(true);
-                if (user && user.uid) {
-                    const token_data = await getUserToken(user.uid);
+                // If coin amount is 0, get user token and set coin amount.
+                if (coinAmount == 0 && user && user.uid){
+                    const token_data = await getUserCoin(user.uid);
                     if (token_data) {
-                        setcoinAmount(token_data);
+                        dispatch(setCoinAmount(token_data));
                     }
                 }
             } catch (error) {
                 console.error('Error loading user data:', error);
-                setcoinAmount(0);
             } finally {
                 setLoading(false);
             }
@@ -36,7 +37,7 @@ const TopProfileBar = ({navigation}) => {
         <View style={styles.header}>
             <Text style={styles.headerTitle}>{APP_NAME}</Text>
             <View style={styles.rightSection}>
-            <TouchableOpacity onPress={() => navigation.navigate('Token')}>
+            <TouchableOpacity onPress={() => navigation.navigate('MainTabs', { screen: 'Purchase' })}>
                 <View style={styles.coinBox}>
                     <Image 
                         source={require('../../media/common/coin.png')}
@@ -47,7 +48,7 @@ const TopProfileBar = ({navigation}) => {
                         </Text>
                 </View>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
+            <TouchableOpacity onPress={() => navigation.navigate('MainTabs', { screen: 'Profile' })}>
                 <Ionicons 
                     name="person-circle-outline" 
                             size={38} 

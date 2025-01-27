@@ -1,7 +1,5 @@
-import { StyleSheet, Text, View, TouchableOpacity, ScrollView, SafeAreaView, RefreshControl } from 'react-native'
+import { StyleSheet, ScrollView, SafeAreaView, RefreshControl } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import { LinearGradient } from 'expo-linear-gradient'
-import BottomNavigation from '../../components/BottomNavigation';
 import TopProfileBar from '../common/TopProfileBar';
 import { getFortuneHistory } from '../../services/fortuneServices';
 import { useSelector } from 'react-redux';
@@ -12,10 +10,10 @@ import ScreenWrapper from '../../components/ScreenWrapper';
 
 const History = ({ navigation }) => {
   const [historyItems, setHistoryItems] = useState([]);
-  const user = useSelector((state) => state.userAuth.user);
   const [isLoading, setIsLoading] = useState(true);
-  const alert = useAlert();
   const [refreshing, setRefreshing] = useState(false);
+  const user = useSelector((state) => state.userAuth.user);
+  const alert = useAlert();
 
   const fetchHistory = async () => {
     try {

@@ -1,6 +1,6 @@
 import Home from "./Home";
 import Profile from "./Profile";
 import History from "./History";
-import Token from "./Token";
+import Purchase from "./Purchase";
 
-export { Home, Profile, History, Token };
+export { Home, Profile, History, Purchase };

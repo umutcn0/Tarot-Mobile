@@ -7,29 +7,26 @@ import {
   SafeAreaView,
 } from "react-native";
 import React, {useState, useEffect} from "react";
-import { LinearGradient } from "expo-linear-gradient";
-import BottomNavigation from "../../components/BottomNavigation";
 import TopProfileBar from "../common/TopProfileBar";
 import {
   RewardedAd,
   RewardedAdEventType,
-  TestIds,
 } from "react-native-google-mobile-ads";
 import Loading from "../common/Loading";
 import { useSelector } from 'react-redux';
-import { updateUserToken } from "../../services/tokenServices";
+import { updateUserCoin } from "../../services/coinServices";
 import ScreenWrapper from '../../components/ScreenWrapper';
 
-const DisableAds = ({ tokenAmount, price }) => {
+const DisableAds = ({ coinAmount, price }) => {
   return (
-    <TouchableOpacity style={styles.tokenOption}>
-      <Text style={styles.tokenText}>{tokenAmount} Tokens</Text>
-      <Text style={styles.tokenPrice}>${price}.00</Text>
+    <TouchableOpacity style={styles.coinOption}>
+      <Text style={styles.coinText}>{coinAmount} Coins</Text>
+      <Text style={styles.coinPrice}>${price}.00</Text>
     </TouchableOpacity>
   );
 };
 
-const Token = ({ navigation }) => {
+const Purchase = ({ navigation }) => {
   const [loaded, setLoaded] = useState(true);
   const user = useSelector((state) => state.userAuth.user);
 
@@ -53,7 +50,7 @@ const Token = ({ navigation }) => {
       RewardedAdEventType.EARNED_REWARD,
       (reward) => {
         console.log("User earned reward of ", reward.amount);
-        updateUserToken(user.uid, reward.amount);
+        updateUserCoin(user.uid, reward.amount);
         navigation.navigate("Home");
       }
     );
@@ -67,34 +64,34 @@ const Token = ({ navigation }) => {
   };
 
   return (
-    <ScreenWrapper navigation={navigation} pageName="Token">
+    <ScreenWrapper navigation={navigation} pageName="Purchase">
       {!loaded && <Loading />}
       <SafeAreaView style={styles.container}>
         <TopProfileBar navigation={navigation} />
 
-        {/* Token Purchase Section */}
+        {/* Coin Purchase Section */}
         <ScrollView style={styles.scrollView}>
-          {/* Token Options */}
-          <View style={styles.tokenOptions}>
+          {/* Coin Options */}
+          <View style={styles.coinOptions}>
             <TouchableOpacity style={styles.disableAdsOption}>
-              <Text style={styles.tokenText}>Reklamları Kaldır</Text>
-              <Text style={styles.tokenPrice}>$5</Text>
+              <Text style={styles.coinText}>Reklamları Kaldır</Text>
+              <Text style={styles.coinPrice}>$5</Text>
             </TouchableOpacity>
-            <DisableAds tokenAmount={10} price={5} />
-            <DisableAds tokenAmount={50} price={20} />
-            <DisableAds tokenAmount={100} price={35} />
+            <DisableAds coinAmount={10} price={5} />
+            <DisableAds coinAmount={50} price={20} />
+            <DisableAds coinAmount={100} price={35} />
           </View>
-          {/* Earn Tokens Section */}
-          <View style={styles.earnTokensSection}>
-            <Text style={styles.earnText}>Video İzleyerek Token Kazan!</Text>
-            <Text style={styles.earnSubtext}>Her sefer sadece 1 token</Text>
+          {/* Earn Coins Section */}
+          <View style={styles.earnCoinsSection}>
+            <Text style={styles.earnText}>Video İzleyerek Coin Kazan!</Text>
+            <Text style={styles.earnSubtext}>Her sefer sadece 1 coin</Text>
             <TouchableOpacity
               style={styles.earnButton}
               onPress={() => {
                 loadAd(); // Load and show ad when button is clicked
               }}
             >
-              <Text style={styles.earnButtonText}>Token Kazan</Text>
+              <Text style={styles.earnButtonText}>Coin Kazan</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
@@ -128,7 +125,7 @@ const styles = StyleSheet.create({
     color: "rgba(244, 114, 182, 0.7)",
     marginBottom: 16,
   },
-  tokenOption: {
+  coinOption: {
     backgroundColor: "rgba(255, 255, 255, 0.1)",
     borderRadius: 12,
     padding: 16,
@@ -142,16 +139,16 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     alignItems: "center",
   },
-  tokenText: {
+  coinText: {
     fontSize: 18,
     fontWeight: "bold",
     color: "#fff",
   },
-  tokenPrice: {
+  coinPrice: {
     fontSize: 14,
     color: "rgba(244, 114, 182, 0.7)",
   },
-  earnTokensSection: {
+  earnCoinsSection: {
     backgroundColor: "rgba(255, 255, 255, 0.1)",
     borderRadius: 12,
     padding: 16,
@@ -194,4 +191,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Token;
+export default Purchase;
