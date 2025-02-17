@@ -1,13 +1,17 @@
 {
   "expo": {
-    "name": "tarot",
+    "name": "Tarotly",
     "slug": "tarot",
     "version": "1.0.0",
+    "icon": "./assets/logo.jpg",
     "android": {
-      "package": "com.capsiel.tarot"
+      "package": "com.tarotly.app"
     },
     "ios": {
-      "bundleIdentifier": "com.capsiel.tarot"
+      "bundleIdentifier": "com.tarotly.app",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "plugins": [
       [
@@ -78,7 +82,7 @@
       }
     },
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/logo.jpg",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     }

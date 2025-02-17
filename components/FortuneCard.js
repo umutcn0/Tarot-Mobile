@@ -10,7 +10,7 @@ const FortuneCard = ( { navigation, navigationPage, category_title, category_des
         <Ionicons name={icon} size={32} color="#fff" />
         <Text style={styles.fortuneTitle}>{category_title}</Text>
         <View style={styles.coinBox}>
-          <Image source={ require('../media/common/coin.png') }
+          <Image source={ require('../assets/coin.png') }
             style={styles.coinImage}
           ></Image>
           <Text style={styles.coinText}>{coinAmount}</Text>

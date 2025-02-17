@@ -35,10 +35,5 @@ export const updateUserCoin = async (userId, coinAmount) => {
   const newCoinAmount = currentCoinAmount + coinAmount;
   
   await updateDoc(docRef, { coinAmount: newCoinAmount });
-
-  // Update Redux state
-  const dispatch = useDispatch();
-  dispatch(setCoinAmount(newCoinAmount));
-
   return { id: userId, coinAmount: newCoinAmount };
 };

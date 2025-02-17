@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View, TouchableOpacity, FlatList, SafeAreaView, Image } from 'react-native'
 import React, { useState, useEffect } from 'react'
+import { useSelector, useDispatch } from 'react-redux';
 import { cardImages, defaultCardsImages } from '../../media/imageList';
 import Loading from '../common/Loading';
 import TopProfileBar from '../common/TopProfileBar';
@@ -7,10 +8,12 @@ import { sendFortune } from '../../services/backendServices';
 import { updateUserCoin } from '../../services/coinServices';
 import { useAlert } from '../../hooks/useAlert';
 import ScreenWrapper from '../../components/ScreenWrapper';
+import { setCoinAmount } from '../../database/redux/slices/coinSlice';
 
 
 const CardSelection = ({ navigation, route }) => {
   const alert = useAlert();
+  const dispatch = useDispatch();
   const { selectCardAmount = 3, category_title, category_description } = route.params;
   const [cards, setCards] = useState([]);
   const [defaultCards, setDefaultCards] = useState([]);
@@ -19,7 +22,8 @@ const CardSelection = ({ navigation, route }) => {
   const [numColumns, setNumColumns] = useState(3);
   const [isSending, setIsSending] = useState(false);
   const coinAmount = useSelector((state) => state.coin.coinAmount);
-  
+  const userUid = useSelector((state) => state.userAuth.uid);
+
   useEffect(() => {
     const shuffleArray = (array) => {
       for (let i = array.length - 1; i > 0; i--) {
@@ -70,18 +74,15 @@ const CardSelection = ({ navigation, route }) => {
         return;
       }
 
-      const userInfo = await dispatch(getUserAsync(user.uid));
       const request_status = await sendFortune({
         selectedCards: selectedCards,
         category_title: category_title,
         category_description: category_description,
-        }, 
-        user.uid,
-        userInfo
-      );
+      }, userUid);
 
       if (request_status) {
-        await updateUserCoin(user.uid, -3);
+        const result = await updateUserCoin(userUid, -3);
+        dispatch(setCoinAmount(result.coinAmount));
         alert("Falınız başarıyla gönderildi.");
         navigation.navigate('MainTabs', { screen: 'Home' });
       } else {
@@ -89,6 +90,7 @@ const CardSelection = ({ navigation, route }) => {
       }
 
     } catch (error) {
+      console.log(error);
       alert('Fal gönderilirken bir hata oluştu');
     } finally {
       setIsSending(false);

@@ -40,7 +40,7 @@ const TopProfileBar = ({navigation}) => {
             <TouchableOpacity onPress={() => navigation.navigate('MainTabs', { screen: 'Purchase' })}>
                 <View style={styles.coinBox}>
                     <Image 
-                        source={require('../../media/common/coin.png')}
+                        source={require('../../assets/coin.png')}
                             style={styles.coinImage}
                         />
                         <Text style={styles.coinText}>
@@ -76,8 +76,8 @@ const styles = StyleSheet.create({
         color: '#fff',
       },
     coinImage: {
-        height: 30,
-        width: 30,
+        height: 20,
+        width: 20,
         opacity: 1,
     },
     coinText: {
@@ -86,6 +86,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         opacity: 1,
         marginRight: 8,
+        marginLeft: 5,
     },
     coinBox: {
         flexDirection: 'row',

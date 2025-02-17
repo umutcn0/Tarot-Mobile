@@ -1,7 +1,5 @@
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native'
 import React, { useState } from 'react'
-import { LinearGradient } from 'expo-linear-gradient'
-import BottomNavigation from '../../components/BottomNavigation'
 import { createSupportTicket } from '../../services/supportServices'
 import { useSelector } from 'react-redux'
 import Loading from '../common/Loading'

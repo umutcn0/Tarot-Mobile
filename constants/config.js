@@ -1,5 +1,5 @@
 // App Config
-export const APP_NAME = 'Tarotix';
+export const APP_NAME = 'Tarotly';
 export const DEFAULT_LANGUAGE = "Türkçe";
 export const DEFAULT_CURRENCY = "TRY";
 

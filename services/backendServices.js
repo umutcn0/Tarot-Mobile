@@ -1,5 +1,5 @@
 import {getAuth} from 'firebase/auth'
-
+import { useSelector } from 'react-redux';
 const SERVER_URL = process.env.EXPO_PUBLIC_API_SERVER_URL 
 
 if (!SERVER_URL) {
@@ -23,10 +23,9 @@ export const getAuthToken = async () => {
  * @param {string} userId - The user ID
  * @returns {Promise<Object>} The response from the backend
  */
-export const sendFortune = async (items, userId, userInfo) => {
+export const sendFortune = async (items, userId) => {
     try {
       const token = await getAuthToken();
-
       const request_body = {
         "selected_cards": items.selectedCards,
         "user_id": userId,

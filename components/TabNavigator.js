@@ -52,7 +52,7 @@ const TabNavigator = () => {
       <Tab.Screen 
         name="Purchase" 
         component={Purchase}
-        options={{ tabBarLabel: 'Purchase' }}
+        options={{ tabBarLabel: 'Satın Al' }}
       />
       <Tab.Screen 
         name="Profile" 

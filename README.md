@@ -1,2 +1,2 @@
-# Tarot-Mobile
+# Tarotly
 Tarot mobile application 
